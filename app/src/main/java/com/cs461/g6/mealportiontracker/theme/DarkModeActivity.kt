@@ -78,7 +78,7 @@ class DarkModeActivity : AppCompatActivity() {
 // think of composable functions to be similar to lego blocks - each composable function is in turn
 // built up of smaller composable functions.
 @Composable
-fun CustomTheme(enableDarkMode: MutableState<Boolean>, children: @Composable() () -> Unit) {
+fun CustomTheme(enableDarkMode: MutableState<Boolean>, children: @Composable () -> Unit) {
     // lightColors is a default implementation of the ColorPalette from the MaterialDesign
     // specification https://material.io/design/color/the-color-system.html#color-theme-creation.
     // for easy use. In this case, I'm just showing an example of how you can

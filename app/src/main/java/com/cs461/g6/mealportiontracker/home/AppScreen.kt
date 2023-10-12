@@ -1,10 +1,5 @@
 package com.cs461.g6.mealportiontracker.home
 
-/**
- * title can also come from StringRes
- *
- * enum class Screen(@StringRes title: Int) { ... }
- */
 enum class AppScreen(val title: String) {
     ScreenA(title = "Screen A"),
     ScreenB(title = "Screen B"),

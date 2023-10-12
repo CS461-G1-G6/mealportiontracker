@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".core.MainActivity">
+        <activity android:name=".core.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,103 +23,103 @@
             android:name="androidx.activity.ComponentActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".text.SimpleTextActivity"
+            android:name=".samples.text.SimpleTextActivity"
             android:exported="true"
             android:label="@string/title_activity_compose"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".text.CustomTextActivity"
+            android:name=".samples.text.CustomTextActivity"
             android:exported="true"
             android:label="@string/title_activity_custom_text"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".scrollers.VerticalScrollableActivity"
+            android:name=".samples.scrollers.VerticalScrollableActivity"
             android:exported="true"
             android:label="@string/title_activity_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".scrollers.HorizontalScrollableActivity"
+            android:name=".samples.scrollers.HorizontalScrollableActivity"
             android:exported="true"
             android:label="@string/title_activity_horizontal_scrollable"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".image.ImageActivity"
+            android:name=".samples.image.ImageActivity"
             android:exported="true"
             android:label="@string/title_activity_image"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".material.AlertDialogActivity"
+            android:name=".samples.material.AlertDialogActivity"
             android:exported="true"
             android:label="@string/title_activity_clickable"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".material.DrawerAppActivity"
+            android:name=".samples.material.DrawerAppActivity"
             android:exported="true"
             android:label="@string/title_activity_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".material.ButtonActivity"
+            android:name=".samples.material.ButtonActivity"
             android:exported="true"
             android:label="@string/title_activity_button"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".state.StateActivity"
+            android:name=".samples.state.StateActivity"
             android:exported="true"
             android:label="@string/title_activity_state"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".customview.CustomViewActivity"
+            android:name=".samples.customview.CustomViewActivity"
             android:exported="true"
             android:label="@string/title_custom_view"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".customview.CustomViewPaintActivity"
+            android:name=".samples.customview.CustomViewPaintActivity"
             android:exported="true"
             android:label="@string/title_custom_view_paint"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".text.TextFieldActivity"
+            android:name=".samples.text.TextFieldActivity"
             android:exported="true"
             android:label="@string/title_text_input_example"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
-            android:name=".stack.StackActivity"
+            android:name=".samples.stack.StackActivity"
             android:exported="true"
             android:label="@string/title_stack_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".layout.ViewLayoutConfigurationsActivity"
+            android:name=".samples.layout.ViewLayoutConfigurationsActivity"
             android:exported="true"
             android:label="@string/title_view_arrangement_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".material.MaterialActivity"
+            android:name=".samples.material.MaterialActivity"
             android:exported="true"
             android:label="@string/title_material_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".material.FixedActionButtonActivity"
+            android:name=".samples.material.FixedActionButtonActivity"
             android:exported="true"
             android:label="@string/title_fab_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".layout.ConstraintLayoutActivity"
+            android:name=".samples.layout.ConstraintLayoutActivity"
             android:exported="true"
             android:label="@string/title_constraint_layout_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".material.BottomNavigationActivity"
+            android:name=".samples.material.BottomNavigationActivity"
             android:exported="true"
             android:label="@string/title_bottom_navigation_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".animation.Animation1Activity"
+            android:name=".samples.animation.Animation1Activity"
             android:exported="true"
             android:label="@string/title_animation_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".animation.Animation2Activity"
+            android:name=".samples.animation.Animation2Activity"
             android:exported="true"
             android:label="@string/title_animation_example"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -128,63 +129,63 @@
             android:label="@string/title_theme_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".layout.LayoutModifierActivity"
+            android:name=".samples.layout.LayoutModifierActivity"
             android:exported="true"
             android:label="@string/title_layout_modifier_examples"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".state.ProcessDeathActivity"
+            android:name=".samples.state.ProcessDeathActivity"
             android:exported="true"
             android:label="@string/title_process_death_examples"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
-            android:name=".state.livedata.LiveDataActivity"
+            android:name=".samples.state.livedata.LiveDataActivity"
             android:exported="true"
             android:label="@string/title_live_data_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".material.FlowRowActivity"
+            android:name=".samples.material.FlowRowActivity"
             android:exported="true"
             android:label="@string/title_filter_chips_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".material.ShadowActivity"
+            android:name=".samples.material.ShadowActivity"
             android:exported="true"
             android:label="@string/title_shadow_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".state.coroutine.CoroutineFlowActivity"
+            android:name=".samples.state.coroutine.CoroutineFlowActivity"
             android:exported="true"
             android:label="@string/title_coroutine_flow_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".animation.TextAnimationActivity"
+            android:name=".samples.animation.TextAnimationActivity"
             android:exported="true"
             android:label="@string/title_animation_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".interop.ComposeInClassicAndroidActivity"
+            android:name=".samples.interop.ComposeInClassicAndroidActivity"
             android:exported="true"
             android:label="@string/title_compose_classic_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".customview.MeasuringScaleActivity"
+            android:name=".samples.customview.MeasuringScaleActivity"
             android:exported="true"
             android:label="@string/title_measuring_scale_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".state.backpress.BackPressActivity"
+            android:name=".samples.state.backpress.BackPressActivity"
             android:exported="true"
             android:label="@string/title_back_press_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".customview.ZoomableActivity"
+            android:name=".samples.customview.ZoomableActivity"
             android:exported="true"
             android:label="@string/title_zoomable_example"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".animation.ListAnimationActivity"
+            android:name=".samples.animation.ListAnimationActivity"
             android:exported="true"
             android:label="@string/title_list_animation_example"
             android:theme="@style/AppTheme.NoActionBar" />
