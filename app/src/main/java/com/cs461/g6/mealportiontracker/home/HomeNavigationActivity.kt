@@ -3,39 +3,15 @@ package com.cs461.g6.mealportiontracker.home
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarData
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarResult
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.lightColors
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,27 +19,53 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.cs461.g6.mealportiontracker.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class ComposeNavigationActivity : ComponentActivity() {
+class HomeNavigationActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App()
+            MealTheme{
+                App()
+            }
         }
     }
+
+}
+
+
+val mealColors = lightColors(
+    primary = Color(0xFFFF9C29),
+    primaryVariant = Color(0xFFF8694D),
+    onPrimary = Color(0xFFFFFFFF),
+    secondary = Color(0xFFA1C44D),
+    secondaryVariant = Color(0xFFFFD966),
+    onSecondary = Color(0xFF000000),
+    background = Color(0xFFFDF4DD),
+    onBackground = Color(0xFF000000),
+    surface = Color(0xFFFFDF92),
+    onSurface = Color(0xFF000000),
+    error = Color(0xFFB00020)
+)
+
+
+
+@Composable
+fun MealTheme(children: @Composable () -> Unit) {
+    MaterialTheme(colors = mealColors, content = children)
 }
 
 @Composable
@@ -89,7 +91,7 @@ fun App(
         },
         // --------------- BOTTOM NAVIGATION
         bottomBar = {
-            MyBottomNavBar(scope,scaffoldState)
+            MyBottomNavBar(scope, scaffoldState, navController)
         },
 
         // --------------- FLOATING BUTTON
@@ -144,14 +146,17 @@ private fun MyTopAppBar(
 
 
 @Composable
-fun MySnackbar(data: SnackbarData){
+fun MySnackbar(data: SnackbarData) {
     Card(shape = RoundedCornerShape(4.dp), modifier = Modifier.padding(8.dp)) {
         Snackbar(
             content = {
-                Text(text = data.message)
+                Text(
+                    text = "Hello, World!"
+                    )
+
             }, action = {
                 if (data.actionLabel != null) {
-                    Text(text = data.actionLabel.toString(),color = Color.Yellow)
+                    Text(text = data.actionLabel.toString(), color = Color.Yellow)
                 }
             }
         )
@@ -161,30 +166,36 @@ fun MySnackbar(data: SnackbarData){
 @Composable
 fun MyBottomNavBar(
     scope: CoroutineScope,
-    scaffoldState:ScaffoldState
+    scaffoldState: ScaffoldState,
+    navController: NavHostController
 ) {
-    val listItems = listOf("Profile", "History", "Dash", "Log")
+    val listItems = listOf("Profile", "History", "Stats", "Settings")
     var selectedIndex by remember { mutableStateOf(0) }
 
     BottomNavigation {
         listItems.forEachIndexed { index, label ->
             BottomNavigationItem(
+                unselectedContentColor = mealColors.surface,
                 icon = {
                     when (label) {
                         "Profile" -> Icon(
                             imageVector = Icons.Filled.Face,
                             contentDescription = null
                         )
+
                         "History" -> Icon(
                             imageVector = Icons.Filled.DateRange,
                             contentDescription = null
                         )
-                        "Dash" -> Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = null
+
+                        "Stats" -> Icon(
+                            painter = painterResource(id = R.drawable.ic_piechart),
+                            contentDescription = "Stats"
                         )
-                        "Log" -> Icon(
-                            imageVector = Icons.Filled.List,
+
+
+                        "Settings" -> Icon(
+                            imageVector = Icons.Filled.Settings,
                             contentDescription = null
                         )
                     }
@@ -195,16 +206,22 @@ fun MyBottomNavBar(
                 selected = selectedIndex == index,
                 onClick = {
                     selectedIndex = index
+                    when (index) {
+                        0 -> navController.navigate(AppScreen.ScreenProfile.name)
+                        1 -> navController.navigate(AppScreen.ScreenHistory.name)
+                        2 -> navController.navigate(AppScreen.ScreenStats.name)
+                        3 -> navController.navigate(AppScreen.ScreenSettings.name)
+                    }
                     scope.launch {
                         val result = scaffoldState.snackbarHostState.showSnackbar(
                             message = "Clicked$index, $label",
-                            actionLabel = "OK",
-                            duration = SnackbarDuration.Short
+                            actionLabel = "OK"
                         )
                         when (result) {
                             SnackbarResult.ActionPerformed -> {
                                 //Do Something
                             }
+
                             SnackbarResult.Dismissed -> {
                                 //Do Something
                             }
@@ -221,12 +238,15 @@ fun MyBottomNavBar(
 fun MyBottomNavBarFAB() {
     FloatingActionButton(
         onClick = {
-
+                  // Go to Camera
         },
-        backgroundColor = Color.Yellow
+        contentColor = Color.White
     ) {
         IconButton(onClick = {}) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
+            Icon(
+                painter = painterResource(id = R.drawable.ic_camera),
+                contentDescription = "Custom Icon"
+            )
         }
     }
 }
@@ -240,140 +260,28 @@ private fun AppNavHost(
     NavHost(
         navController = navController,
         // ---------------------------- The first screen to load
-        startDestination = AppScreen.ScreenA.name,
+        startDestination = AppScreen.ScreenProfile.name,
     ) {
-        // ---------------------------- Add screens here as needed
-//        composable(route = AppScreen.ScreenB.name) {
-//            ScreenB(
-//                onBackClick = { navController.navigateUp() },
-//                onNextClick = { navController.navigate(AppScreen.ScreenC.name) },
-//            )
-//        }
-        composable(route = AppScreen.ScreenA.name) {
-            ScreenA(
-                onNextClick = { navController.navigate(AppScreen.ScreenB.name) }
-            )
+
+        composable(route = AppScreen.ScreenProfile.name) {
+            ScreenProfile()
         }
 
-        composable(route = AppScreen.ScreenB.name) {
-            ScreenB(
-                onBackClick = { navController.navigateUp() },
-                onNextClick = { navController.navigate(AppScreen.ScreenC.name) },
-            )
+        composable(route = AppScreen.ScreenHistory.name) {
+            ScreenHistory()
         }
 
-        composable(route = AppScreen.ScreenC.name) {
-            ScreenC(
-                onBackClick = { navController.navigateUp() },
-                onResetClick = {
-                    navController.popBackStack(
-                        route = AppScreen.ScreenA.name,
-                        inclusive = false
-                    )
-                }
-            )
+        composable(route = AppScreen.ScreenStats.name) {
+            ScreenStats()
+        }
+
+        composable(route = AppScreen.ScreenSettings.name) {
+            ScreenSettings()
         }
     }
 }
 
-// ---------------------------- Pages here
-@Composable
-private fun ScreenA(
-    onNextClick: () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Screen A",
-            style = MaterialTheme.typography.h5
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = onNextClick,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Navigate to Screen B")
-        }
-    }
-}
 
-@Composable
-private fun ScreenB(
-    onBackClick: () -> Unit,
-    onNextClick: () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Screen B",
-            style = MaterialTheme.typography.h5
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = onBackClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Navigate to Screen A")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = onNextClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Navigate to Screen C")
-        }
-
-    }
-}
-
-@Composable
-private fun ScreenC(
-    onBackClick: () -> Unit,
-    onResetClick: () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Screen C",
-            style = MaterialTheme.typography.h5
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = onBackClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Navigate to Screen B")
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Button(
-            onClick = onResetClick,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Navigate to Screen A (PopupTo with Inclusive)")
-        }
-    }
-}

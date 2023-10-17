@@ -79,35 +79,22 @@ class DarkModeActivity : AppCompatActivity() {
 // built up of smaller composable functions.
 @Composable
 fun CustomTheme(enableDarkMode: MutableState<Boolean>, children: @Composable () -> Unit) {
-    // lightColors is a default implementation of the ColorPalette from the MaterialDesign
-    // specification https://material.io/design/color/the-color-system.html#color-theme-creation.
-    // for easy use. In this case, I'm just showing an example of how you can
-    // override any of the values that are a part of the Palette even though I'm just using the
-    // default values itself.
     val lightColors = lightColors(
-        primary = Color(0xFF6200EE),
-        primaryVariant = Color(0xFF3700B3),
+        primary = Color(0xFFFF9C29),
+        primaryVariant = Color(0xFFF8694D),
         onPrimary = Color(0xFFFFFFFF),
-        secondary = Color(0xFF03DAC5),
-        secondaryVariant = Color(0xFF0000FF),
+        secondary = Color(0xFFA1C44D),
+        secondaryVariant = Color(0xFFFFD966),
         onSecondary = Color(0xFF000000),
-        background = Color(0xFFFFFFFF),
+        background = Color(0xFFFEE7B1),
         onBackground = Color(0xFF000000),
-        surface = Color(0xFFFFFFFF),
+        surface = Color(0xFFFEE7B1),
         onSurface = Color(0xFF000000),
         error = Color(0xFFB00020),
-        onError = Color(0xFFFFFFFF)
     )
 
-    // darkColors is a default implementation of dark mode ColorPalette from the
-    // Material Design specification
-    // https://material.io/design/color/the-color-system.html#color-theme-creation.
     val darkColors = darkColors()
     val colors = if (enableDarkMode.value) darkColors else lightColors
-
-    // Data class holding typography definitions as defined by the
-    // Material typography specification
-    // https://material.io/design/typography/the-type-system.html#type-scale
     val typography = Typography(
         body1 = TextStyle(
             fontFamily = FontFamily.Serif,
@@ -117,9 +104,6 @@ fun CustomTheme(enableDarkMode: MutableState<Boolean>, children: @Composable () 
             textAlign = Justify
         )
     )
-
-    // A MaterialTheme comprises of colors, typography and the child composables that are going
-    // to make use of this styling.
     MaterialTheme(colors = colors, content = children, typography = typography)
 }
 
