@@ -1,6 +1,8 @@
 package com.cs461.g6.mealportiontracker.home
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -29,8 +31,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cs461.g6.mealportiontracker.R
+import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
 
 class HomeNavigationActivity : ComponentActivity() {
 
@@ -236,16 +240,21 @@ fun MyBottomNavBar(
 
 @Composable
 fun MyBottomNavBarFAB() {
+    val context = LocalContext.current
     FloatingActionButton(
         onClick = {
-                  // Go to Camera
+
         },
         contentColor = Color.White
     ) {
-        IconButton(onClick = {}) {
+        IconButton(onClick = {
+            val intent = Intent(context, CameraXPreviewActivity::class.java)
+            context.startActivity(intent)
+        }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_camera),
                 contentDescription = "Custom Icon"
+
             )
         }
     }
