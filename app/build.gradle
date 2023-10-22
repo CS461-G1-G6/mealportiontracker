@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 32
@@ -52,6 +53,8 @@ android {
     // > 2 files found with path 'META-INF/AL2.0' from inputs:
 }
 
+tasks.register("prepareKotlinBuildScriptModel"){}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -86,6 +89,7 @@ dependencies {
     implementation deps.compose.material
     implementation deps.compose.savedInstanceState
     implementation deps.compose.uiLiveData
+    implementation 'com.google.firebase:firebase-database:20.3.0'
     androidTestImplementation deps.compose.composeNavigationTest
     androidTestImplementation deps.compose.uiTest
 
@@ -95,4 +99,9 @@ dependencies {
 
     testImplementation deps.test.junit
     androidTestImplementation deps.test.junitImplementation
+
+    implementation(platform("com.google.firebase:firebase-bom:30.0.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+
 }
