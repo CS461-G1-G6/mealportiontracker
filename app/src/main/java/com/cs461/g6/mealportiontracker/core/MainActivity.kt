@@ -20,6 +20,7 @@ import com.cs461.g6.mealportiontracker.samples.state.coroutine.CoroutineFlowActi
 import com.cs461.g6.mealportiontracker.samples.state.livedata.LiveDataActivity
 import com.cs461.g6.mealportiontracker.samples.text.*
 import com.cs461.g6.mealportiontracker.theme.DarkModeActivity
+import com.cs461.g6.mealportiontracker.accounts.AccountNavigationActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,7 +31,8 @@ class MainActivity : AppCompatActivity() {
             2. (Not Logged In) Sign-in / Sign-in as guest
             3. (Logged In) Home Screen
        */
-        startActivity(Intent(this, HomeNavigationActivity::class.java))
+        // startActivity(Intent(this, HomeNavigationActivity::class.java))
+        startActivity(Intent(this, AccountNavigationActivity::class.java))
 //        startActivity(Intent(this, AccountNavigationActivity::class.java))
 //        setContentView(R.layout.activity_main)
     }

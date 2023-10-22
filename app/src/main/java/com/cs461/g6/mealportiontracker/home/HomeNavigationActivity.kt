@@ -35,6 +35,7 @@ import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
+import com.cs461.g6.mealportiontracker.utils.SessionManager
 
 class HomeNavigationActivity : ComponentActivity() {
 
@@ -42,8 +43,9 @@ class HomeNavigationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val sessionManager = SessionManager(this)
             MealTheme{
-                App()
+                App(sessionManager)
             }
         }
     }
@@ -73,8 +75,8 @@ fun MealTheme(children: @Composable () -> Unit) {
 }
 
 @Composable
-fun App(
-    navController: NavHostController = rememberNavController()
+fun App(sessionManager: SessionManager,
+        navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = AppScreen.valueOf(
@@ -117,7 +119,7 @@ fun App(
             modifier = Modifier.padding(innerPadding) // #1
         ) {
             // or you can directly pass the modifier(#1) to AppNavHost(..)
-            AppNavHost(navController)
+            AppNavHost(sessionManager, navController)
         }
     }
 }
@@ -264,6 +266,7 @@ fun MyBottomNavBarFAB() {
 // ---------------------------- Manages the navigation between pages
 @Composable
 private fun AppNavHost(
+    sessionManager: SessionManager,
     navController: NavHostController,
 ) {
     NavHost(
@@ -273,7 +276,7 @@ private fun AppNavHost(
     ) {
 
         composable(route = AppScreen.ScreenProfile.name) {
-            ScreenProfile()
+            ScreenProfile(sessionManager, navController)
         }
 
         composable(route = AppScreen.ScreenHistory.name) {

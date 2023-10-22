@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdk 34
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "com.example.jetpackcomposeplayground"
-        minSdk 21
-        targetSdk 34
+        minSdkVersion 21
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -52,6 +53,7 @@ android {
     // > 2 files found with path 'META-INF/AL2.0' from inputs:
 }
 
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -87,6 +89,7 @@ dependencies {
     implementation deps.compose.savedInstanceState
     implementation deps.compose.uiLiveData
     implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.firebase:firebase-database:20.3.0'
     androidTestImplementation deps.compose.composeNavigationTest
     androidTestImplementation deps.compose.uiTest
 
@@ -108,5 +111,10 @@ dependencies {
     implementation 'org.pytorch:pytorch_android:2.1.0'
     implementation 'org.pytorch:pytorch_android_torchvision:2.1.0'
 
+    implementation(platform("com.google.firebase:firebase-bom:30.0.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
 
 }
+
+tasks.register("prepareKotlinBuildScriptModel"){}
