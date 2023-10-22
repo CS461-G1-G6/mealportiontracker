@@ -8,8 +8,8 @@ enum class AppScreen(val title: String) {
 
     //Bottom Navigation Tabs
     ScreenProfile(title = "Profile"),
-    ScreenHistory(title = "Your Meal History"),
-    //ScreenManualInput(title = "Manual Input"),
+    //ScreenHistory(title = "Your Meal History"),
+    ScreenManualInput(title = "Manual Input"),
     ScreenStats(title = "Your Progress"),
     ScreenSettings(title = "Settings"),
 
