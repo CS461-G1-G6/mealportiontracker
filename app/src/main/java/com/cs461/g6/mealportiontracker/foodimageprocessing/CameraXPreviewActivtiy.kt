@@ -59,6 +59,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import com.cs461.g6.mealportiontracker.home.mealColors
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.rememberPermissionState
@@ -104,17 +105,25 @@ fun App(modifier: Modifier = Modifier) {
                             Intent(Intent(context, FoodImageProcessingActivity::class.java))
                         intent.putExtra("imageUri", imageUri.toString())
                         context.startActivity(intent)
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = mealColors.primary // Set the background color to the primary color
+                    )
+
+
                 ) {
-                    Text("Process Image", modifier.padding())
+                    Text("Process Image", modifier.padding(), color = mealColors.onPrimary)
                 }
 
                 Button(
                     onClick = {
                         imageUri = EMPTY_IMAGE_URI
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = mealColors.primary // Set the background color to the primary color
+                    )
                 ) {
-                    Text("Remove image", modifier.padding())
+                    Text("Remove image", modifier.padding(), color = mealColors.onPrimary)
                 }
             }
 
@@ -143,9 +152,12 @@ fun App(modifier: Modifier = Modifier) {
                         .padding(4.dp),
                     onClick = {
                         showGallerySelect = true
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = mealColors.primary // Set the background color to the primary color
+                    )
                 ) {
-                    Text("Select from Gallery", modifier = Modifier.padding())
+                    Text("Select from Gallery", modifier = Modifier.padding(), color = mealColors.onPrimary)
                 }
             }
         }
@@ -191,18 +203,24 @@ fun GallerySelect(
                                         data = Uri.fromParts("package", context.packageName, null)
                                     }
                                 )
-                            }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = mealColors.primary // Set the background color to the primary color
+                            )
                         ) {
-                            Text("Open Settings")
+                            Text("Open Settings", color = mealColors.onPrimary)
                         }
                         // If they don't want to grant permissions, this button will result in going back
                         Button(
                             modifier = Modifier.padding(4.dp),
                             onClick = {
                                 onImageUri(EMPTY_IMAGE_URI)
-                            }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = mealColors.primary // Set the background color to the primary color
+                            )
                         ) {
-                            Text("Use Camera")
+                            Text("Use Camera", color = mealColors.onPrimary)
                         }
                     }
                 }
@@ -240,9 +258,12 @@ fun CameraCapture(
                                 data = Uri.fromParts("package", context.packageName, null)
                             }
                         )
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = mealColors.primary // Set the background color to the primary color
+                    )
                 ) {
-                    Text("Open Settings")
+                    Text("Open Settings", color = mealColors.onPrimary)
                 }
             }
         }

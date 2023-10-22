@@ -8,7 +8,14 @@ import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +43,15 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import kotlin.concurrent.thread
+import com.cs461.g6.mealportiontracker.home.mealColors
 
+data class FoodInfo(
+    val name: String,
+    val calories: Int,
+    val proteins: Int,
+    val carbo: Int,
+    val fats: Int
+)
 
 class FoodImageProcessingActivity : AppCompatActivity() {
 
@@ -52,38 +67,76 @@ class FoodImageProcessingActivity : AppCompatActivity() {
 @Composable
 fun App(imageUri: String) {
     val context = LocalContext.current
-    var result by remember {
-        mutableStateOf("")
-    }
+    var foodInfo by remember { mutableStateOf<FoodInfo?>(null) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (result.isNotEmpty()) {
-            val resultWithCalories = "$result Calories"
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (foodInfo != null) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                FoodInfoRow("Food Name", foodInfo!!.name)
+                FoodInfoRow("Calories", foodInfo!!.calories.toString())
+                FoodInfoRow("Proteins", foodInfo!!.proteins.toString())
+                FoodInfoRow("Carbo", foodInfo!!.carbo.toString())
+                FoodInfoRow("Fats", foodInfo!!.fats.toString())
+            }
 
-            Text(
-                text = resultWithCalories,
-                color = Color.Black,
-                modifier = Modifier.align(Alignment.Center),
-                fontWeight = FontWeight.Black,
-                fontSize = 30.sp
-            )
+            // Add your button here
+            Button(
+                onClick = {
+                    // Handle the button click event
+                    // You can add the logic to add the food item to a list, for example
+                },
+                modifier = Modifier.padding(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = mealColors.primary // Set the background color to the primary color
+                )
+            ) {
+                Text("Add Food", color = mealColors.onPrimary)
+
+            }
+
         } else {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
     }
 
     LaunchedEffect(key1 = Unit) {
-        processFoodImage(context, imageUri) { resultText ->
-            result = resultText
+        processFoodImage(context, imageUri) { resultFoodInfo ->
+            foodInfo = resultFoodInfo
         }
     }
+}
 
+@Composable
+fun FoodInfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+//        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "$label: ",
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
+        Text(
+            text = value,
+            color = Color.Black,
+            fontSize = 20.sp
+        )
+    }
 }
 
 private fun processFoodImage(
     context: Context,
     imageUri: String,
-    resultText: (result: String) -> Unit
+    resultFoodInfo: (FoodInfo) -> Unit
 ) {
     Glide.with(context)
         .asBitmap()
@@ -93,14 +146,11 @@ private fun processFoodImage(
                 resource: Bitmap,
                 transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
             ) {
-
                 thread {
                     try {
                         val resizedBitmap = Bitmap.createScaledBitmap(resource, 224, 224, false)
                         val moduleFileAbsoluteFilePath = assetFilePath(context, "model.pt")?.let {
-                            File(
-                                it
-                            ).absolutePath
+                            File(it).absolutePath
                         }
                         val module = Module.load(moduleFileAbsoluteFilePath)
                         val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
@@ -122,11 +172,11 @@ private fun processFoodImage(
                         }
 
                         Log.v("ai result", maxScoreIdx.toString())
-                        resultText(getFoodNameAndCaloriesFromModelResult(context, maxScoreIdx).uppercase())
+                        val foodInfo = getFoodNameAndCaloriesFromModelResult(context, maxScoreIdx)
+                        resultFoodInfo(foodInfo)
                     } catch (error: Exception) {
                         error.localizedMessage?.let { Log.e("AI error", it) }
                     }
-
                 }
             }
 
@@ -135,7 +185,7 @@ private fun processFoodImage(
         })
 }
 
-private fun getFoodNameAndCaloriesFromModelResult(context: Context, score: Int): String {
+private fun getFoodNameAndCaloriesFromModelResult(context: Context, score: Int): FoodInfo {
     lateinit var jsonString: String
     try {
         jsonString = context.assets.open("food_and_calories.json")
@@ -145,9 +195,23 @@ private fun getFoodNameAndCaloriesFromModelResult(context: Context, score: Int):
         ioException.localizedMessage?.let { Log.e("error", it) }
     }
 
-    val listFoodType = object : TypeToken<ArrayList<String>>() {}.type
-    val foodList: ArrayList<String> = Gson().fromJson(jsonString, listFoodType)
-    return foodList.get(score)
+    val listType = object : TypeToken<List<String>>() {}.type
+    val foodList: List<String> = Gson().fromJson(jsonString, listType)
+    val foodData = foodList[score].split(": ")
+    val foodName = foodData[0]
+    val nutrientValues = foodData[1].split(", ").map { it.toInt() }
+
+    if (nutrientValues.size == 4) {
+        val calories = nutrientValues[0]
+        val proteins = nutrientValues[1]
+        val carbo = nutrientValues[2]
+        val fats = nutrientValues[3]
+
+        return FoodInfo(foodName, calories, proteins, carbo, fats)
+    } else {
+        // Handle invalid data in the JSON
+        return FoodInfo("", 0, 0, 0, 0)
+    }
 }
 
 private fun assetFilePath(context: Context, assetName: String): String? {
@@ -170,7 +234,7 @@ private fun assetFilePath(context: Context, assetName: String): String? {
     } catch (e: IOException) {
         Log.e(
             "Error",
-            "Error process asset $assetName to file path"
+            "Error processing asset $assetName to a file path"
         )
     }
     return null
