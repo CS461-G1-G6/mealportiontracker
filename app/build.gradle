@@ -45,6 +45,7 @@ android {
             excludes += ['META-INF/AL2.0', 'META-INF/LGPL2.1']
         }
     }
+    namespace 'com.cs461.g6.mealportiontracker'
 
 // Added to avoid this error -
     // Execution failed for task ':app:mergeDebugAndroidTestJavaResource'.

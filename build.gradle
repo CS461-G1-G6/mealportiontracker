@@ -11,7 +11,7 @@ buildscript {
             'coroutine': '1.6.2',
             'espresso': '3.2.0',
             'glide': '4.13.2',
-            'gradle': '7.2.1',
+            'gradle': '8.1.0',
             'junit' : '4.12',
             'junitImplementation' : '1.1.1',
             'kotlin': '1.6.21',
