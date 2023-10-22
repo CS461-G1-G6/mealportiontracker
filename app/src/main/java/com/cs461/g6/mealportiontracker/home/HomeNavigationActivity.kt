@@ -208,8 +208,8 @@ fun MyBottomNavBar(
                     selectedIndex = index
                     when (index) {
                         0 -> navController.navigate(AppScreen.ScreenProfile.name)
-                        1 -> navController.navigate(AppScreen.ScreenManualInput.name)
-                        //1 -> navController.navigate(AppScreen.ScreenHistory.name)
+                        //1 -> navController.navigate(AppScreen.ScreenManualInput.name)
+                        1 -> navController.navigate(AppScreen.ScreenHistory.name)
                         2 -> navController.navigate(AppScreen.ScreenStats.name)
                         3 -> navController.navigate(AppScreen.ScreenSettings.name)
                     }
@@ -268,9 +268,15 @@ private fun AppNavHost(
             ScreenProfile()
         }
 
+        composable(route = AppScreen.ScreenHistory.name) {
+            ScreenHistory()
+        }
+
+        /*
         composable(route = AppScreen.ScreenManualInput.name) {
             ScreenManualInput()
         }
+         */
 
         composable(route = AppScreen.ScreenStats.name) {
             ScreenStats()
