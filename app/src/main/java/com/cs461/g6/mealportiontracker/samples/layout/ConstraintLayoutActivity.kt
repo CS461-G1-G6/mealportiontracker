@@ -4,11 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.material.Text
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
@@ -152,7 +148,7 @@ fun SimpleConstraintLayoutComponent() {
                     }
             ) {
                 // Image is a pre-defined composable that lays out and draws a given [ImageBitmap].
-                Image(painterResource(R.drawable.landscape), contentDescription = null)
+                Image(painterResource(R.drawable.bliss), contentDescription = null)
             }
         }
     }

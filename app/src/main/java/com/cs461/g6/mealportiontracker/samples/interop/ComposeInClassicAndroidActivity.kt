@@ -29,8 +29,8 @@ class ComposeInClassicAndroidActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_compose_in_classic_android)
-        containerLayout = findViewById(R.id.compose_view)
+//        setContentView(R.layout.activity_compose_in_classic_android)
+//        containerLayout = findViewById(R.id.compose_view)
         // We make use of the setContent extension function that's available on the ComposeView 
         // view that is capable of hosting a @Composable function inside it. This allows us to 
         // render composables inside classic android views.

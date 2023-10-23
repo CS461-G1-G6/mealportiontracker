@@ -4,34 +4,21 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.text.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
@@ -134,7 +121,7 @@ fun ComposeLogoComponent() {
     // rememberInfiniteTransition is used to create a transition that uses infitine
     // child animations. Animations typically get invoked as soon as they enter the
     // composition so don't need to be explicitly started.
-    val infiniteTransition = rememberInfiniteTransition()
+    val infiniteTransition = rememberInfiniteTransition(label = "")
     // Create a value that is altered by the transition based on the configuration. We use
     // the animated float value the returns and updates a float from the initial value to
     // target value and repeats it (as its called on the infititeTransition).
@@ -142,11 +129,11 @@ fun ComposeLogoComponent() {
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
-            animation = tween<Float>(
+            animation = tween(
                 durationMillis = 3000,
                 easing = FastOutLinearInEasing,
             ),
-        )
+        ), label = ""
     )
 
     // You can think of Modifiers as implementations of the decorators pattern that are
@@ -181,9 +168,9 @@ fun ColorChangingTextComponent() {
     // rest remain unchanged. This ensures efficiency and is a performance optimization. It
     // is inspired from existing frameworks like React.
     val currentColor by remember { mutableStateOf(Color.Red) }
-    val transition = updateTransition(currentColor)
+    val transition = updateTransition(currentColor, label = "")
 
-    val color by transition.animateColor { state ->
+    val color by transition.animateColor(label = "") { state ->
         when (state) {
             Color.Red -> Color.Green
             Color.Green -> Color.Blue

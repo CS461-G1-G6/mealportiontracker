@@ -11,35 +11,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.Glide
@@ -76,7 +62,7 @@ fun LazyListScope.displayImagesComponent() {
     // for a single element in the list
     item {
         TitleComponent("Load image from the resource folder")
-        LocalResourceImageComponent(R.drawable.landscape)
+        LocalResourceImageComponent(R.drawable.bliss)
     }
 
     item {
@@ -95,7 +81,7 @@ fun LazyListScope.displayImagesComponent() {
 
     item {
         TitleComponent("Image with rounded corners")
-        ImageWithRoundedCorners(R.drawable.landscape)
+        ImageWithRoundedCorners(R.drawable.bliss)
     }
 }
 
@@ -175,7 +161,6 @@ fun NetworkImageComponentPicasso(
         val picasso = Picasso.get()
         val target = object : Target {
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                // TODO(lmr): we could use the drawable below
                 drawable = placeHolderDrawable
             }
 
@@ -337,16 +322,6 @@ fun TitleComponent(title: String) {
     )
 }
 
-// RoundedCornerClipModifier is a custom Modifier that is responsible for clipping and
-// providing a rounder corner to the composable its applied to.
-// Recommendation from -
-// https://kotlinlang.slack .com/archives/CJLTWPH7S/p1589826323481600?thread_ts=1589821110.478100&cid=CJLTWPH7S
-// TODO(vinaygaba) Add some more comments here
-fun Modifier.RoundedCornerClipModifier(size: Dp): Modifier = composed {
-    val shape = RoundedCornerShape(size)
-    clip(shape)
-}
-
 /**
  * Android Studio lets you preview your composable functions within the IDE itself, instead of
  * needing to download the app to an Android device or emulator. This is a fantastic feature as you
@@ -360,7 +335,7 @@ fun Modifier.RoundedCornerClipModifier(size: Dp): Modifier = composed {
 @Composable
 fun LocalResourceImageComponentPreview() {
     Column {
-        LocalResourceImageComponent(R.drawable.landscape)
+        LocalResourceImageComponent(R.drawable.bliss)
     }
 }
 
@@ -379,5 +354,5 @@ fun NetworkImageComponentGlidePreview() {
 @Preview("Add round corners to an image")
 @Composable
 fun ImageWithRoundedCornersPreview() {
-    ImageWithRoundedCorners(R.drawable.landscape)
+    ImageWithRoundedCorners(R.drawable.bliss)
 }

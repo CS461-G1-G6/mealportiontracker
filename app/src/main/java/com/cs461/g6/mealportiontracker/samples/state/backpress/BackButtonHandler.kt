@@ -4,12 +4,7 @@ import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcherOwner
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 
 /**
@@ -49,7 +44,7 @@ private class ComposableBackHandler(enabled: Boolean) : OnBackPressedCallback(en
 // think of composable functions to be similar to lego blocks - each composable function is in turn 
 // built up of smaller composable functions.
 @Composable
-internal fun handler(
+internal fun Handler(
     enabled: Boolean = true,
     onBackPressed: () -> Unit
 ) {
@@ -115,7 +110,7 @@ internal fun BackButtonHandler(onBackPressed: () -> Unit) {
     CompositionLocalProvider(
         LocalBackPressedDispatcher provides context as ComponentActivity
     ) {
-        handler {
+        Handler {
             onBackPressed()
         }
     }
