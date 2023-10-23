@@ -1,7 +1,6 @@
 package com.cs461.g6.mealportiontracker.home
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +16,7 @@ class MealHistory {
 @Composable
 fun ScreenHistory(
 ) {
-    var buttonTxt = "Historyy"
+    val pageName = "Your Meal History"
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -26,20 +25,11 @@ fun ScreenHistory(
             .padding(16.dp)
     ) {
         Text(
-            text = buttonTxt,
+            text = pageName,
             style = MaterialTheme.typography.h5
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                buttonTxt = "heloo"
-            }
-            ,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Navigate to Screen B")
-        }
     }
 }

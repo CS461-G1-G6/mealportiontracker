@@ -10,7 +10,7 @@ enum class AppScreen(val title: String) {
     ScreenProfile(title = "Profile"),
     ScreenHistory(title = "Your Meal History"),
     ScreenStats(title = "Your Progress"),
-    ScreenSettings(title = "Settings"),
+    ScreenManual(title = "Log a Meal"),
 
     ScreenDash(title = ""),
     ScreenLog(title = ""),

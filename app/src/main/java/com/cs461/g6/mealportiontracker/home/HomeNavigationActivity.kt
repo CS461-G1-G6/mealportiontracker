@@ -141,7 +141,7 @@ fun MyBottomNavBar(
     scaffoldState: ScaffoldState,
     navController: NavHostController
 ) {
-    val listItems = listOf("Profile", "History", "Stats", "Settings")
+    val listItems = listOf("Profile", "History", "Stats", "Log Meal")
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     BottomNavigation {
@@ -166,8 +166,8 @@ fun MyBottomNavBar(
                         )
 
 
-                        "Settings" -> Icon(
-                            imageVector = Icons.Filled.Settings,
+                        "Log Meal" -> Icon(
+                            imageVector = Icons.Filled.Edit,
                             contentDescription = null
                         )
                     }
@@ -182,23 +182,23 @@ fun MyBottomNavBar(
                         0 -> navController.navigate(AppScreen.ScreenProfile.name)
                         1 -> navController.navigate(AppScreen.ScreenHistory.name)
                         2 -> navController.navigate(AppScreen.ScreenStats.name)
-                        3 -> navController.navigate(AppScreen.ScreenSettings.name)
+                        3 -> navController.navigate(AppScreen.ScreenManual.name)
                     }
-                    scope.launch {
-                        val result = scaffoldState.snackbarHostState.showSnackbar(
-                            message = "Clicked$index, $label",
-                            actionLabel = "OK"
-                        )
-                        when (result) {
-                            SnackbarResult.ActionPerformed -> {
-                                //Do Something
-                            }
-
-                            SnackbarResult.Dismissed -> {
-                                //Do Something
-                            }
-                        }
-                    }
+//                    scope.launch {
+//                        val result = scaffoldState.snackbarHostState.showSnackbar(
+//                            message = "Clicked$index, $label",
+//                            actionLabel = "OK"
+//                        )
+//                        when (result) {
+//                            SnackbarResult.ActionPerformed -> {
+//                                //Do Something
+//                            }
+//
+//                            SnackbarResult.Dismissed -> {
+//                                //Do Something
+//                            }
+//                        }
+//                    }
                 },
                 alwaysShowLabel = true
             )
@@ -253,8 +253,8 @@ private fun AppNavHost(
             ScreenStats()
         }
 
-        composable(route = AppScreen.ScreenSettings.name) {
-            ScreenSettings()
+        composable(route = AppScreen.ScreenManual.name) {
+            ScreenManual()
         }
     }
 }

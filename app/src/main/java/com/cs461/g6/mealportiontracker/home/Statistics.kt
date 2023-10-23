@@ -15,7 +15,7 @@ class Statistics {
 @Composable
 fun ScreenStats(
 ) {
-    var buttonTxt = "Stats"
+    val buttonTxt = "User Statistics"
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -30,14 +30,5 @@ fun ScreenStats(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = {
-                buttonTxt = "heloo"
-            }
-            ,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Navigate to Screen B")
-        }
     }
 }
