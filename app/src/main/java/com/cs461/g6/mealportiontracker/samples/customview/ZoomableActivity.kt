@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,9 +50,9 @@ fun ZoomableComposable() {
     // This ensures that only the composables that depend on this will be redraw while the 
     // rest remain unchanged. This ensures efficiency and is a performance optimization. It 
     // is inspired from existing frameworks like React.
-    var scale by remember { mutableStateOf(1f) }
-    var offsetX by remember { mutableStateOf(0f) }
-    var offsetY by remember { mutableStateOf(0f) }
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    var offsetY by remember { mutableFloatStateOf(0f) }
 
     // Column is a composable that places its children in a vertical sequence. You
     // can think of it similar to a LinearLayout with the vertical orientation. 
@@ -82,7 +83,7 @@ fun ZoomableComposable() {
         // There are multiple methods available to load an image resource in Compose. 
         // However, it would be advisable to use the painterResource method as it loads
         // an image resource asynchronously
-        val imagepainter = painterResource(id = R.drawable.landscape)
+        val imagepainter = painterResource(id = R.drawable.bliss)
         // Image is a pre-defined composable that lays out and draws a given [ImageBitmap].
         // We use the graphicsLayer modifier to modify the scale & translation of the image.
         // This is read from the state properties that we created above.

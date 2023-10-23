@@ -1,10 +1,10 @@
 <resources>
 
-<!--App Stuff-->
+    <!--App Stuff-->
     <string name="app_name">Meal Portion Tracker</string>
     <string name="app_tagline">Healthy meals everyday!</string>
 
-<!--Labels (Buttons, TextViews, etc.)-->
+    <!--Labels (Buttons, TextViews, etc.)-->
 
     <string name="title_activity_compose">Simple Text Example</string>
     <string name="title_activity_custom_text">Custom Text Example</string>

@@ -1,5 +1,6 @@
 package com.cs461.g6.mealportiontracker.home
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,30 +8,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.lightColors
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.cs461.g6.mealportiontracker.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
+import com.cs461.g6.mealportiontracker.theme.MealTheme
+import com.cs461.g6.mealportiontracker.utils.SessionManager
 
 class HomeNavigationActivity : ComponentActivity() {
 
@@ -38,8 +30,9 @@ class HomeNavigationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val sessionManager = SessionManager(this)
             MealTheme{
-                App()
+                App(sessionManager)
             }
         }
     }
@@ -47,30 +40,9 @@ class HomeNavigationActivity : ComponentActivity() {
 }
 
 
-val mealColors = lightColors(
-    primary = Color(0xFFFF9C29),
-    primaryVariant = Color(0xFFF8694D),
-    onPrimary = Color(0xFFFFFFFF),
-    secondary = Color(0xFFA1C44D),
-    secondaryVariant = Color(0xFFFFD966),
-    onSecondary = Color(0xFF000000),
-    background = Color(0xFFFDF4DD),
-    onBackground = Color(0xFF000000),
-    surface = Color(0xFFFFDF92),
-    onSurface = Color(0xFF000000),
-    error = Color(0xFFB00020)
-)
-
-
-
 @Composable
-fun MealTheme(children: @Composable () -> Unit) {
-    MaterialTheme(colors = mealColors, content = children)
-}
-
-@Composable
-fun App(
-    navController: NavHostController = rememberNavController()
+fun App(sessionManager: SessionManager,
+        navController: NavHostController = rememberNavController()
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = AppScreen.valueOf(
@@ -113,7 +85,7 @@ fun App(
             modifier = Modifier.padding(innerPadding) // #1
         ) {
             // or you can directly pass the modifier(#1) to AppNavHost(..)
-            AppNavHost(navController)
+            AppNavHost(sessionManager, navController)
         }
     }
 }
@@ -152,7 +124,7 @@ fun MySnackbar(data: SnackbarData) {
             content = {
                 Text(
                     text = "Hello, World!"
-                    )
+                )
 
             }, action = {
                 if (data.actionLabel != null) {
@@ -170,12 +142,12 @@ fun MyBottomNavBar(
     navController: NavHostController
 ) {
     val listItems = listOf("Profile", "History", "Stats", "Settings")
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
 
     BottomNavigation {
         listItems.forEachIndexed { index, label ->
             BottomNavigationItem(
-                unselectedContentColor = mealColors.surface,
+                unselectedContentColor =   Color(0x66FFFFFF),
                 icon = {
                     when (label) {
                         "Profile" -> Icon(
@@ -236,16 +208,21 @@ fun MyBottomNavBar(
 
 @Composable
 fun MyBottomNavBarFAB() {
+    val context = LocalContext.current
     FloatingActionButton(
         onClick = {
-                  // Go to Camera
+
         },
         contentColor = Color.White
     ) {
-        IconButton(onClick = {}) {
+        IconButton(onClick = {
+            val intent = Intent(context, CameraXPreviewActivity::class.java)
+            context.startActivity(intent)
+        }) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_camera),
                 contentDescription = "Custom Icon"
+
             )
         }
     }
@@ -255,6 +232,7 @@ fun MyBottomNavBarFAB() {
 // ---------------------------- Manages the navigation between pages
 @Composable
 private fun AppNavHost(
+    sessionManager: SessionManager,
     navController: NavHostController,
 ) {
     NavHost(
@@ -264,7 +242,7 @@ private fun AppNavHost(
     ) {
 
         composable(route = AppScreen.ScreenProfile.name) {
-            ScreenProfile()
+            ScreenProfile(sessionManager, navController)
         }
 
         composable(route = AppScreen.ScreenHistory.name) {
