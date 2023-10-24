@@ -2,6 +2,7 @@ package com.cs461.g6.mealportiontracker.accounts
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
+import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
 import com.cs461.g6.mealportiontracker.home.AppScreen
 import com.cs461.g6.mealportiontracker.home.User
 import com.cs461.g6.mealportiontracker.home.UserAuth
@@ -107,6 +109,11 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
                         sessionManager.saveUserData(user!!.uid, user!!.email ?: "", password, true)
 
                         navController.navigate(AppScreen.ScreenProfile.name)
+
+                        // For testing
+                        // val intent = Intent(mContext, CameraXPreviewActivity::class.java)
+                        // mContext.startActivity(intent)
+
 
                     } else {
                         /*val exception = task.exception
