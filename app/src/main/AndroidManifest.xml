@@ -3,6 +3,12 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -195,6 +201,16 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".accounts.AccountNavigationActivity"
+            android:exported="true"
+            android:label="@string/title_compose_navigation_example"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".foodimageprocessing.CameraXPreviewActivity"
+            android:exported="true"
+            android:label="@string/title_compose_navigation_example"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".foodimageprocessing.FoodImageProcessingActivity"
             android:exported="true"
             android:label="@string/title_compose_navigation_example"
             android:theme="@style/AppTheme.NoActionBar" />

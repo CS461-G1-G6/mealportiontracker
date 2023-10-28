@@ -1,3 +1,9 @@
+# Download Model
+Download the model used for Food Processing from [this link](https://smu-my.sharepoint.com/:u:/g/personal/zhiwei_lim_2020_scis_smu_edu_sg/EfPzSw0vSUdPkFRdSnbx73gBJCGZRNyu9T3aCqMWcT_FoQ?e=FsULVI)
+and place it in "mealportiontracker\app\src\main\assets"
+
+-------------------------------------------------------------
+
 # Learn Jetpack Compose By Example 
 ![Android CI](https://github.com/vinaygaba/Learn-Jetpack-Compose-By-Example/workflows/Android%20CI/badge.svg) ![Compose Version](https://img.shields.io/badge/Compose-1.0.1-brightgreen) ![Android Weekly](https://androidweekly.net/issues/issue-414/badge)
 
