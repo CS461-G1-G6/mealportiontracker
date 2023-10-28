@@ -1,6 +1,14 @@
 package com.cs461.g6.mealportiontracker.home
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -9,14 +17,18 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
-import androidx.compose.runtime.*
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
-import androidx.compose.material.TextFieldDefaults
 
 @Composable
 fun ScreenManualInput() {
@@ -85,30 +97,6 @@ fun ScreenManualInput() {
                             .width(320.dp) // Set the width of the TextField
                     )
 
-                    Spacer(modifier = Modifier.height(25.dp))
-
-                    Text(
-                        text = "Quantity",
-                        modifier = Modifier
-                            .padding(start = 35.dp)
-                            .fillMaxWidth(),
-                        style = LocalTextStyle.current.copy(fontSize = 16.sp),
-                        color = LocalContentColor.current.copy(alpha = 0.7f)
-                    )
-
-                    TextField(
-                        value = pair.second,
-                        onValueChange = {
-                            val updatedIngredients = ingredients.toMutableList()
-                            updatedIngredients[index] = Pair(pair.first, it)
-                            ingredients = updatedIngredients
-                        },
-                        colors = TextFieldDefaults.textFieldColors(
-                            backgroundColor = Color.Transparent
-                        ),
-                        placeholder = { Text("Enter Ingredient Wuantity") },
-                        modifier = Modifier.width(320.dp) // Set the width of the TextField
-                    )
                 }
 
                 Spacer(modifier = Modifier.height(50.dp))
