@@ -3,10 +3,14 @@ package com.cs461.g6.mealportiontracker.home
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -29,14 +34,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,44 +49,56 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.AndroidViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.home.ui.theme.SearchBarComposeTheme
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.text.SimpleDateFormat
+import java.util.*
 
-class MainActivity : ComponentActivity() {
+
+class SearchFoodActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val navController = rememberNavController()
             SearchBarComposeTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(viewModel = viewModel)
+                    ScreenSearchFood(navController, viewModel = viewModel)
                 }
             }
         }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.N)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
+fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel) {
 
     //Collecting states from ViewModel
     val searchText by viewModel.searchText.collectAsState()
     val filteredFoodItemList by viewModel.filteredFoodItemList.collectAsState()
 
     var query by remember { mutableStateOf(searchText) }
+
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -95,6 +110,10 @@ fun MainScreen(viewModel: MainViewModel) {
                 },
                 onSearch = {
                     viewModel.onSearchTextChange(query)
+                },
+                onAddClick = {
+                    val intent = Intent(context, ManualInputActivity::class.java)
+                    context.startActivity(intent)
                 }
             )
         }
@@ -112,7 +131,44 @@ fun MainScreen(viewModel: MainViewModel) {
             ) {
                 items(filteredFoodItemList) { foodItem ->
                     FoodItemRow(foodItem = foodItem, onAddButtonClick = {
-                        // Handle adding the food item here
+                        // Handle adding the food item into the database here
+
+                        //Need to ask
+                        val userId = FirebaseAuthUtil.getCurrentUser()!!.uid
+
+                        val protein = foodItem.proteins.replace("[^\\d.]".toRegex(), "").toDoubleOrNull() ?: 0.0
+
+                        val carbs = foodItem.carbs.replace("[^\\d.]".toRegex(), "").toDoubleOrNull() ?: 0.0
+
+                        val fat = foodItem.fats.replace("[^\\d.]".toRegex(), "").toDoubleOrNull() ?: 0.0
+
+                        val currentTimeMillis = System.currentTimeMillis()
+                        val sdf = SimpleDateFormat("d MMMM yyyy 'at' HH:mm:ss 'UTC'Z", Locale.getDefault())
+                        val timeZone = TimeZone.getTimeZone("GMT+8") // Set your desired time zone
+                        sdf.timeZone = timeZone
+
+                        val formattedDate = sdf.format(currentTimeMillis)
+
+                        val date: Date = sdf.parse(formattedDate) // Parse the formatted date string to Date object
+                        val timestamp: Timestamp = Timestamp(date) // Convert Date object to Timestamp object
+
+                        FirebaseAuthUtil.addMealHistory(userId, foodItem.name, foodItem.calories, protein, carbs, fat, timestamp)
+                            .thenAccept { success ->
+                                if (success) {
+                                    Toast.makeText(
+                                        context,
+                                        "The food has been successfully added",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "The food could not be added. Please try again later.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+
                     })
                 }
             }
@@ -120,69 +176,78 @@ fun MainScreen(viewModel: MainViewModel) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    onSearch: () -> Unit
+    onSearch: () -> Unit,
+    onAddClick: () -> Unit // Add this lambda parameter
 ) {
     var searchText by remember { mutableStateOf(query) }
-    val bgColor: Color = Color(244,240,236) // Creates a green color using hexadecimal value
-    val iconColor: Color = Color(169,169,169)
+    val bgColor: Color = Color(244, 240, 236)
+    val iconColor: Color = Color(169, 169, 169)
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        TextField(
-            value = searchText,
-            onValueChange = {
-                searchText = it
-                onQueryChange(it)
-            },
-            placeholder = { Text("Search food...") },
+        Row(
             modifier = Modifier
-                .fillMaxWidth(),
-            colors = TextFieldDefaults.textFieldColors (
-                backgroundColor = bgColor,
-                disabledLabelColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            shape = RoundedCornerShape(20.dp),
-            singleLine = true,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = iconColor
-                )
-            },
-            trailingIcon = {
-                if (searchText.isNotEmpty()) {
-                    IconButton(onClick = {
-                        searchText = ""
-                        onQueryChange("")
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                            tint = iconColor
-                        )
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+        ) {
+            TextField(
+                value = searchText,
+                onValueChange = {
+                    searchText = it
+                    onQueryChange(it)
+                },
+                placeholder = { Text("Search food...") },
+                modifier = Modifier
+                    .weight(1f) // Take up remaining space
+                    .padding(end = 8.dp), // Add padding to the end
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = bgColor,
+                    disabledLabelColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(20.dp),
+                singleLine = true,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = iconColor
+                    )
+                },
+                trailingIcon = {
+                    if (searchText.isNotEmpty()) {
+                        IconButton(onClick = {
+                            searchText = ""
+                            onQueryChange("")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = null,
+                                tint = iconColor
+                            )
+                        }
                     }
                 }
-            }
-        )
-
-        DisposableEffect(Unit) {
-            onDispose {
-                // Handle any cleanup if needed
+            )
+            // Add button next to the search bar
+            Button(
+                onClick = { onAddClick() }, // Call the provided onAddClick lambda when the button is clicked
+                modifier = Modifier.padding(start = 8.dp, top = 3.dp) // Add padding to the start of the button
+            ) {
+                Text("Add")
             }
         }
     }
 }
+
 
 @Composable
 fun FoodItemRow(foodItem: FoodItem, onAddButtonClick: () -> Unit) {
@@ -221,7 +286,7 @@ fun FoodItemRow(foodItem: FoodItem, onAddButtonClick: () -> Unit) {
 
             // Add icon aligned to the right end and vertically centered
             IconButton(
-                onClick = { onAddButtonClick },
+                onClick = { onAddButtonClick() },
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

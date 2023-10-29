@@ -4,14 +4,29 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Card
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarData
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarResult
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.lightColors
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -22,8 +37,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,11 +48,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cs461.g6.mealportiontracker.R
 import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
+import com.cs461.g6.mealportiontracker.utils.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import androidx.compose.ui.platform.LocalContext
-import com.cs461.g6.mealportiontracker.utils.SessionManager
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 class HomeNavigationActivity : ComponentActivity() {
 
@@ -176,7 +191,7 @@ fun MyBottomNavBar(
     scaffoldState: ScaffoldState,
     navController: NavHostController
 ) {
-    val listItems = listOf("Profile", "History", "Stats", "Settings")
+    val listItems = listOf("Profile", "History", "Stats", "Search")
     var selectedIndex by remember { mutableStateOf(0) }
 
     BottomNavigation {
@@ -201,8 +216,8 @@ fun MyBottomNavBar(
                         )
 
 
-                        "Settings" -> Icon(
-                            imageVector = Icons.Filled.Settings,
+                        "Search" -> Icon(
+                            imageVector = Icons.Filled.Search,
                             contentDescription = null
                         )
                     }
@@ -217,7 +232,7 @@ fun MyBottomNavBar(
                         0 -> navController.navigate(AppScreen.ScreenProfile.name)
                         1 -> navController.navigate(AppScreen.ScreenHistory.name)
                         2 -> navController.navigate(AppScreen.ScreenStats.name)
-                        3 -> navController.navigate(AppScreen.onCreate.name)
+                        3 -> navController.navigate(AppScreen.ScreenSearch.name)
                     }
                     scope.launch {
                         val result = scaffoldState.snackbarHostState.showSnackbar(
@@ -289,8 +304,8 @@ private fun AppNavHost(
             ScreenStats()
         }
 
-        composable(route = AppScreen.onCreate.name) {
-            MainScreen(viewModel = viewModel)
+        composable(route = AppScreen.ScreenSearch.name) {
+            ScreenSearchFood(navController, viewModel = viewModel)
         }
     }
 }

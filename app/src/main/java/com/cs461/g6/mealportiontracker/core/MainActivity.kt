@@ -4,23 +4,39 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
-import com.cs461.g6.mealportiontracker.samples.animation.*
-import com.cs461.g6.mealportiontracker.samples.customview.*
+import com.cs461.g6.mealportiontracker.samples.animation.Animation1Activity
+import com.cs461.g6.mealportiontracker.samples.animation.Animation2Activity
+import com.cs461.g6.mealportiontracker.samples.animation.ListAnimationActivity
+import com.cs461.g6.mealportiontracker.samples.animation.TextAnimationActivity
+import com.cs461.g6.mealportiontracker.samples.customview.CustomViewActivity
+import com.cs461.g6.mealportiontracker.samples.customview.CustomViewPaintActivity
+import com.cs461.g6.mealportiontracker.samples.customview.MeasuringScaleActivity
+import com.cs461.g6.mealportiontracker.samples.customview.ZoomableActivity
 import com.cs461.g6.mealportiontracker.samples.image.ImageActivity
 import com.cs461.g6.mealportiontracker.samples.interop.ComposeInClassicAndroidActivity
-import com.cs461.g6.mealportiontracker.samples.layout.*
-import com.cs461.g6.mealportiontracker.samples.material.*
+import com.cs461.g6.mealportiontracker.samples.layout.ConstraintLayoutActivity
+import com.cs461.g6.mealportiontracker.samples.layout.LayoutModifierActivity
+import com.cs461.g6.mealportiontracker.samples.layout.ViewLayoutConfigurationsActivity
+import com.cs461.g6.mealportiontracker.samples.material.AlertDialogActivity
+import com.cs461.g6.mealportiontracker.samples.material.BottomNavigationActivity
+import com.cs461.g6.mealportiontracker.samples.material.ButtonActivity
+import com.cs461.g6.mealportiontracker.samples.material.DrawerAppActivity
+import com.cs461.g6.mealportiontracker.samples.material.FixedActionButtonActivity
+import com.cs461.g6.mealportiontracker.samples.material.FlowRowActivity
+import com.cs461.g6.mealportiontracker.samples.material.MaterialActivity
+import com.cs461.g6.mealportiontracker.samples.material.ShadowActivity
 import com.cs461.g6.mealportiontracker.samples.scrollers.HorizontalScrollableActivity
 import com.cs461.g6.mealportiontracker.samples.scrollers.VerticalScrollableActivity
-import com.cs461.g6.mealportiontracker.samples.stack.*
+import com.cs461.g6.mealportiontracker.samples.stack.StackActivity
 import com.cs461.g6.mealportiontracker.samples.state.ProcessDeathActivity
 import com.cs461.g6.mealportiontracker.samples.state.StateActivity
 import com.cs461.g6.mealportiontracker.samples.state.backpress.BackPressActivity
 import com.cs461.g6.mealportiontracker.samples.state.coroutine.CoroutineFlowActivity
 import com.cs461.g6.mealportiontracker.samples.state.livedata.LiveDataActivity
-import com.cs461.g6.mealportiontracker.samples.text.*
+import com.cs461.g6.mealportiontracker.samples.text.CustomTextActivity
+import com.cs461.g6.mealportiontracker.samples.text.SimpleTextActivity
+import com.cs461.g6.mealportiontracker.samples.text.TextFieldActivity
 import com.cs461.g6.mealportiontracker.theme.DarkModeActivity
-import com.cs461.g6.mealportiontracker.accounts.AccountNavigationActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,8 +47,8 @@ class MainActivity : AppCompatActivity() {
             2. (Not Logged In) Sign-in / Sign-in as guest
             3. (Logged In) Home Screen
        */
-        // startActivity(Intent(this, HomeNavigationActivity::class.java))
-        startActivity(Intent(this, AccountNavigationActivity::class.java))
+        startActivity(Intent(this, HomeNavigationActivity::class.java))
+        //startActivity(Intent(this, AccountNavigationActivity::class.java))
 //        startActivity(Intent(this, AccountNavigationActivity::class.java))
 //        setContentView(R.layout.activity_main)
     }

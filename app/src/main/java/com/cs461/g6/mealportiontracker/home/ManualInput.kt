@@ -1,5 +1,8 @@
 package com.cs461.g6.mealportiontracker.home
 
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,9 +29,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cs461.g6.mealportiontracker.home.ui.theme.SearchBarComposeTheme
+
+class ManualInputActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            SearchBarComposeTheme {
+               ScreenManualInput()
+            }
+        }
+    }
+}
+
 
 @Composable
 fun ScreenManualInput() {
@@ -118,8 +133,3 @@ fun ScreenManualInput() {
     }
 }
 
-@Preview
-@Composable
-fun PreviewManualInputScreen() {
-   ScreenManualInput()
-}
