@@ -1,6 +1,7 @@
 package com.cs461.g6.mealportiontracker.foodimageprocessing
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -36,7 +37,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.FirebaseApp
 import android.net.Uri
+import androidx.compose.foundation.layout.Spacer
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
+import com.cs461.g6.mealportiontracker.home.Statistics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.pytorch.IValue
@@ -80,6 +83,8 @@ class FoodImageProcessingActivity : AppCompatActivity() {
             }
         }
     }
+
+
 }
 
 @Composable
@@ -103,11 +108,13 @@ fun App(imageUri: String) {
                     modifier = Modifier.fillMaxWidth().height(200.dp)
                 )
 
+                Spacer(modifier = Modifier.height(30.dp))
+
                 FoodInfoRow("Food Name", foodInfo!!.name)
-                FoodInfoRow("Calories", foodInfo!!.calories.toString())
-                FoodInfoRow("Proteins", foodInfo!!.proteins.toString())
-                FoodInfoRow("Carbo", foodInfo!!.carbo.toString())
-                FoodInfoRow("Fats", foodInfo!!.fats.toString())
+                FoodInfoRow("Calories (Per 100g)", foodInfo!!.calories.toString())
+                FoodInfoRow("Proteins (Per 100g)", foodInfo!!.proteins.toString())
+                FoodInfoRow("Carbohydrates (Per 100g)", foodInfo!!.carbo.toString())
+                FoodInfoRow("Fats (Per 100g)", foodInfo!!.fats.toString())
             }
 
             // Add your button here
@@ -151,12 +158,12 @@ fun FoodInfoRow(label: String, value: String) {
             text = "$label: ",
             color = Color.Black,
             fontWeight = FontWeight.Bold,
-            fontSize = 18.sp
+//            fontSize = 16.sp
         )
         Text(
             text = value,
             color = Color.Black,
-            fontSize = 18.sp
+//            fontSize = 16.sp
         )
     }
 }
@@ -320,6 +327,8 @@ private fun addFoodInfoToFirebase(context: Context, foodInfo: FoodInfo, imageUri
                                     // Data was successfully saved to the database
                                     // You can add any further logic here if needed
                                     mToast(context, "Food information added to the database!")
+                                    val intent = Intent(context, Statistics::class.java)
+                                    context.startActivity(intent)
                                 } else {
                                     // Handle database save failure
                                     val saveException = saveTask.exception

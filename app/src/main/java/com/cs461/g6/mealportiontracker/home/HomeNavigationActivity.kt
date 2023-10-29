@@ -78,6 +78,7 @@ fun MealTheme(children: @Composable () -> Unit) {
 fun App(sessionManager: SessionManager,
         navController: NavHostController = rememberNavController()
 ) {
+    Log.d("App", "Inside App")
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = AppScreen.valueOf(
         backStackEntry?.destination?.route ?: AppScreen.ScreenA.name
@@ -158,7 +159,7 @@ fun MySnackbar(data: SnackbarData) {
             content = {
                 Text(
                     text = "Hello, World!"
-                    )
+                )
 
             }, action = {
                 if (data.actionLabel != null) {
@@ -175,6 +176,7 @@ fun MyBottomNavBar(
     scaffoldState: ScaffoldState,
     navController: NavHostController
 ) {
+    Log.d("MyBottomNavBar", "Inside MyBottomNavBar")
     val listItems = listOf("Profile", "History", "Stats", "Settings")
     var selectedIndex by remember { mutableStateOf(0) }
 
@@ -272,24 +274,18 @@ private fun AppNavHost(
     NavHost(
         navController = navController,
         // ---------------------------- The first screen to load
-        startDestination = AppScreen.ScreenProfile.name,
+        startDestination = AppScreen.ScreenProfile.name
     ) {
+
 
         composable(route = AppScreen.ScreenProfile.name) {
             ScreenProfile(sessionManager, navController)
         }
 
-        composable(route = AppScreen.ScreenHistory.name) {
-            ScreenHistory()
-        }
-
         composable(route = AppScreen.ScreenStats.name) {
-            ScreenStats()
+            ScreenStats(sessionManager, navController)
         }
 
-        composable(route = AppScreen.ScreenSettings.name) {
-            ScreenSettings()
-        }
     }
 }
 

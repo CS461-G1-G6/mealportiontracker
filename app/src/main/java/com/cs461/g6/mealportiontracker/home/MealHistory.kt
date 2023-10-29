@@ -15,8 +15,7 @@ class MealHistory {
 // TODO: Add Calendar Picker and two tabs (calendar + list, progress graph)
 
 @Composable
-fun ScreenHistory(
-) {
+fun ScreenHistory() {
     var buttonTxt = "Historyy"
     Column(
         verticalArrangement = Arrangement.Center,

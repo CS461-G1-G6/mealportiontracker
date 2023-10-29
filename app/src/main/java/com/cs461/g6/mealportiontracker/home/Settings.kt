@@ -13,8 +13,7 @@ class Settings {
 }
 
 @Composable
-fun ScreenSettings(
-) {
+fun ScreenSettings() {
     var buttonTxt = "setitng"
     Column(
         verticalArrangement = Arrangement.Center,

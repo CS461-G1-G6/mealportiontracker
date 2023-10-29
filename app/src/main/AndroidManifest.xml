@@ -199,12 +199,12 @@
             android:name=".home.HomeNavigationActivity"
             android:exported="true"
             android:label="@string/title_compose_navigation_example"
-            android:theme="@style/AppTheme.NoActionBar" />
+             />
         <activity
             android:name=".accounts.AccountNavigationActivity"
             android:exported="true"
             android:label="@string/title_compose_navigation_example"
-            android:theme="@style/AppTheme.NoActionBar" />
+             />
         <activity
             android:name=".foodimageprocessing.CameraXPreviewActivity"
             android:exported="true"
@@ -212,6 +212,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".foodimageprocessing.FoodImageProcessingActivity"
+            android:exported="true"
+            android:label="@string/title_compose_navigation_example"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".home.Statistics"
             android:exported="true"
             android:label="@string/title_compose_navigation_example"
             android:theme="@style/AppTheme.NoActionBar" />

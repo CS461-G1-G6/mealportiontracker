@@ -15,8 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import com.cs461.g6.mealportiontracker.home.ScreenHistory
 import kotlinx.coroutines.delay
 import com.cs461.g6.mealportiontracker.home.ScreenProfile
+import com.cs461.g6.mealportiontracker.home.ScreenSettings
+import com.cs461.g6.mealportiontracker.home.ScreenStats
 import com.cs461.g6.mealportiontracker.utils.SessionManager
 
 class AccountNavigationActivity : ComponentActivity() {
@@ -96,9 +99,9 @@ private fun AppNavHost(navController: NavHostController, sessionManager: Session
         // ---------------------------- The first screen to load
         startDestination = AppScreen.ScreenSplash.name,
     ) {
-        composable(route = com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name) {
-            ScreenProfile(sessionManager, navController)
-        }
+//        composable(route = com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name) {
+//            ScreenProfile(sessionManager, navController)
+//        }
         composable(route = AppScreen.ScreenSplash.name) {
             LaunchedEffect(Unit) {
                 delay(2000) // Show SplashScreen for 2 seconds
@@ -124,6 +127,12 @@ private fun AppNavHost(navController: NavHostController, sessionManager: Session
         composable(route = com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name) {
             ScreenProfile(sessionManager, navController)
         }
+
+        composable(route = com.cs461.g6.mealportiontracker.home.AppScreen.ScreenStats.name) {
+            ScreenStats(sessionManager, navController)
+        }
+
+
 
         // Add other composables/routes here
 

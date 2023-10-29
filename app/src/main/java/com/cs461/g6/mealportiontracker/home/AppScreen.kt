@@ -14,5 +14,7 @@ enum class AppScreen(val title: String) {
 
     ScreenDash(title = ""),
     ScreenLog(title = ""),
-    ScreenAddMeal(title = ""),
+    ScreenAddMeal(title = ""),;
+
+
 }
