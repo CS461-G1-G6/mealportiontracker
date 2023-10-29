@@ -1,5 +1,6 @@
 package com.cs461.g6.mealportiontracker.home
 
+import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +21,8 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -27,12 +30,14 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
+import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -91,124 +96,168 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
     val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
     val date = dateFormat.format(Date())
 
-    // Fetch user-specific meal histories and update totals
-    LaunchedEffect(currentUser) {
-        currentUser?.let { user ->
-            fetchUserMealHistories(user.uid, date) { mealHistories ->
+    val context = LocalContext.current
+
+    if (currentUser == null) {
+        // Display "No records" when there is no currentUser
+        Text(
+            text = "No records",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+            ),
+            modifier = Modifier.padding(16.dp)
+        )
+    } else {
+        // Display statistics when currentUser is available
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val date = dateFormat.format(Date())
+
+        // Fetch user-specific meal histories and update totals
+        LaunchedEffect(currentUser) {
+            fetchUserMealHistories(currentUser.uid, date) { mealHistories ->
                 val (calories, fats, proteins, carbo) = calculateTotalStatistics(mealHistories)
                 totalCalories = calories
                 totalFats = fats
                 totalProteins = proteins
                 totalCarbo = carbo
             }
-            fetchUserRecommendedCalories(user.uid) { calories ->
+            fetchUserRecommendedCalories(currentUser.uid) { calories ->
                 recommendedCalories = calories
             }
 
         }
     }
 
-    val total = totalFats.toFloat() + totalProteins.toFloat() + totalCarbo.toFloat()
-    val fatPercentage = (totalFats.toFloat() / total) * 100
-    val proteinPercentage = (totalProteins.toFloat() / total) * 100
-    val carboPercentage = (totalCarbo.toFloat() / total) * 100
-
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "Calories Breakdown",
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Text(
-            buildAnnotatedString {
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("Recommended Calories:")
-                }
-                append(" $recommendedCalories")
-            }
-        )
-
-//        Spacer(modifier = Modifier.height(16.dp))
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        // Display the pie chart
-        PieChart(
-            fatPercentage = fatPercentage,
-            proteinPercentage = proteinPercentage,
-            carboPercentage = carboPercentage,
-            modifier = Modifier.size(200.dp)
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            PieChartLegend()
-        }
-
-        Spacer(modifier = Modifier.height(25.dp))
+    if (totalCalories > 0 || totalFats > 0 || totalProteins > 0 || totalCarbo > 0) {
+        val total = totalFats.toFloat() + totalProteins.toFloat() + totalCarbo.toFloat()
+        val fatPercentage = (totalFats.toFloat() / total) * 100
+        val proteinPercentage = (totalProteins.toFloat() / total) * 100
+        val carboPercentage = (totalCarbo.toFloat() / total) * 100
 
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
+            Text(
+                text = "Calories Breakdown",
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+            )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("Recommended Calories:")
+                    }
+                    append(" $recommendedCalories")
+                }
+            )
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            // Display the pie chart
+            PieChart(
+                fatPercentage = fatPercentage,
+                proteinPercentage = proteinPercentage,
+                carboPercentage = carboPercentage,
+                modifier = Modifier.size(180.dp)
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Total Calories", fontWeight = FontWeight.Bold)
-                Text("$totalCalories")
+                PieChartLegend()
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Total Fats (per 100g)", fontWeight = FontWeight.Bold)
-                Text("$totalFats g")
-            }
+            Spacer(modifier = Modifier.height(25.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text("Total Proteins (per 100g)", fontWeight = FontWeight.Bold)
-                Text("$totalProteins g")
-            }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 30.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Total Carbohydrates (per 100g)", fontWeight = FontWeight.Bold)
-                Text("$totalCarbo g")
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Total Calories", fontWeight = FontWeight.Bold)
+                    Text("$totalCalories")
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Total Fats (per 100g)", fontWeight = FontWeight.Bold)
+                    Text("$totalFats g")
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Total Proteins (per 100g)", fontWeight = FontWeight.Bold)
+                    Text("$totalProteins g")
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Total Carbohydrates (per 100g)", fontWeight = FontWeight.Bold)
+                    Text("$totalCarbo g")
+                }
             }
         }
+    } else {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "No records found",
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                ),
+                modifier = Modifier.padding(16.dp)
+            )
 
-
+            Button(
+                onClick = {
+                    val intent = Intent(context, CameraXPreviewActivity::class.java)
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.padding(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = mealColors.primary // Set the background color to the primary color
+                )
+            ) {
+                Text("Capture your meal", color = mealColors.onPrimary)
+            }
+        }
     }
 }
 

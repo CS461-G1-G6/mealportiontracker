@@ -218,8 +218,7 @@
         <activity
             android:name=".home.Statistics"
             android:exported="true"
-            android:label="@string/title_compose_navigation_example"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/title_compose_navigation_example" />
     </application>
 
 </manifest>

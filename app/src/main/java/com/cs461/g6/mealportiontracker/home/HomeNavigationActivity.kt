@@ -286,6 +286,14 @@ private fun AppNavHost(
             ScreenStats(sessionManager, navController)
         }
 
+        composable(route = AppScreen.ScreenHistory.name) {
+            ScreenHistory()
+        }
+
+        composable(route = AppScreen.ScreenSettings.name) {
+            ScreenSettings()
+        }
+
     }
 }
 

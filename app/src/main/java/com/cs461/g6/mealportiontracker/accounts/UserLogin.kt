@@ -126,12 +126,12 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
                         mToast(mContext, "Login Successful!")
                         sessionManager.saveUserData(user!!.uid, user!!.email ?: "", password, true)
 
-//                        navController.navigate(AppScreen.ScreenProfile.name)
-//                        navController.navigate(AppScreen.ScreenStats.name)
+                        navController.navigate(AppScreen.ScreenProfile.name)
 
-                        // For testing
-                        val intent = Intent(mContext, CameraXPreviewActivity::class.java)
-                        mContext.startActivity(intent)
+//                        For testing
+//                        navController.navigate(AppScreen.ScreenStats.name)
+//                        val intent = Intent(mContext, CameraXPreviewActivity::class.java)
+//                        mContext.startActivity(intent)
 
 
                     } else {
