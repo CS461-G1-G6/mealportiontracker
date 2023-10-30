@@ -3,7 +3,6 @@ package com.cs461.g6.mealportiontracker.home
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -26,7 +25,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -110,10 +108,6 @@ fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel)
                 },
                 onSearch = {
                     viewModel.onSearchTextChange(query)
-                },
-                onAddClick = {
-                    val intent = Intent(context, ManualInputActivity::class.java)
-                    context.startActivity(intent)
                 }
             )
         }
@@ -180,8 +174,7 @@ fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel)
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    onSearch: () -> Unit,
-    onAddClick: () -> Unit // Add this lambda parameter
+    onSearch: () -> Unit
 ) {
     var searchText by remember { mutableStateOf(query) }
     val bgColor: Color = Color(244, 240, 236)
@@ -192,59 +185,45 @@ fun SearchBar(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Row(
+        TextField(
+            value = searchText,
+            onValueChange = {
+                searchText = it
+                onQueryChange(it)
+            },
+            placeholder = { Text("Search food...") },
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
-        ) {
-            TextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                    onQueryChange(it)
-                },
-                placeholder = { Text("Search food...") },
-                modifier = Modifier
-                    .weight(1f) // Take up remaining space
-                    .padding(end = 8.dp), // Add padding to the end
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = bgColor,
-                    disabledLabelColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
-                shape = RoundedCornerShape(20.dp),
-                singleLine = true,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = iconColor
-                    )
-                },
-                trailingIcon = {
-                    if (searchText.isNotEmpty()) {
-                        IconButton(onClick = {
-                            searchText = ""
-                            onQueryChange("")
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = null,
-                                tint = iconColor
-                            )
-                        }
+                .fillMaxWidth(),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = bgColor,
+                disabledLabelColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(20.dp),
+            singleLine = true,
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    tint = iconColor
+                )
+            },
+            trailingIcon = {
+                if (searchText.isNotEmpty()) {
+                    IconButton(onClick = {
+                        searchText = ""
+                        onQueryChange("")
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                            tint = iconColor
+                        )
                     }
                 }
-            )
-            // Add button next to the search bar
-            Button(
-                onClick = { onAddClick() }, // Call the provided onAddClick lambda when the button is clicked
-                modifier = Modifier.padding(start = 8.dp, top = 3.dp) // Add padding to the start of the button
-            ) {
-                Text("Add")
             }
-        }
+        )
     }
 }
 
