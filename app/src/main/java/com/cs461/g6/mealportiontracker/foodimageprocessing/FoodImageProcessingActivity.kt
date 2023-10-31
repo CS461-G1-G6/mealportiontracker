@@ -38,6 +38,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.FirebaseApp
 import android.net.Uri
 import androidx.compose.foundation.layout.Spacer
+import com.bumptech.glide.request.transition.Transition
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.home.Statistics
 import com.google.gson.Gson
@@ -51,6 +52,11 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.thread
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.LuminanceSource
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.RGBLuminanceSource
 
 data class FoodInfo(
     val name: String,
@@ -178,48 +184,97 @@ private fun processFoodImage(
         .asBitmap()
         .load(imageUri)
         .into(object : CustomTarget<Bitmap>() {
-            override fun onResourceReady(
-                resource: Bitmap,
-                transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?
-            ) {
-                thread {
-                    try {
-                        val resizedBitmap = Bitmap.createScaledBitmap(resource, 224, 224, false)
-                        val moduleFileAbsoluteFilePath = assetFilePath(context, "model.pt")?.let {
-                            File(it).absolutePath
-                        }
-                        val module = Module.load(moduleFileAbsoluteFilePath)
-                        val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
-                            resizedBitmap,
-                            TensorImageUtils.TORCHVISION_NORM_MEAN_RGB,
-                            TensorImageUtils.TORCHVISION_NORM_STD_RGB,
-                        )
-                        val outputTensor =
-                            module.forward(IValue.from(inputTensor)).toTuple()[0].toTensor()
-                        val scores = outputTensor.dataAsFloatArray
+            override fun onResourceReady( resource: Bitmap, transition: Transition<in Bitmap>?) {
 
-                        var maxScore = -Float.MAX_VALUE
-                        var maxScoreIdx = -1
-                        for (i in scores.indices) {
-                            if (scores[i] > maxScore) {
-                                maxScore = scores[i]
-                                maxScoreIdx = i
+                //if QR Code is detected, decode QR
+                val foodInfo = QRCodeDecoder.process(resource)
+                if (foodInfo != null) {
+                    resultFoodInfo(foodInfo)
+                }
+
+                //if no QR Code detected, run through food model
+                else
+                {
+                    thread {
+                        try {
+                            val resizedBitmap = Bitmap.createScaledBitmap(resource, 224, 224, false)
+                            val moduleFileAbsoluteFilePath = assetFilePath(context, "model.pt")?.let {
+                                File(it).absolutePath
                             }
-                        }
+                            val module = Module.load(moduleFileAbsoluteFilePath)
+                            val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
+                                resizedBitmap,
+                                TensorImageUtils.TORCHVISION_NORM_MEAN_RGB,
+                                TensorImageUtils.TORCHVISION_NORM_STD_RGB,
+                            )
+                            val outputTensor =
+                                module.forward(IValue.from(inputTensor)).toTuple()[0].toTensor()
+                            val scores = outputTensor.dataAsFloatArray
 
-                        Log.v("ai result", maxScoreIdx.toString())
-                        val foodInfo = getFoodNameAndCaloriesFromModelResult(context, maxScoreIdx)
-                        resultFoodInfo(foodInfo)
-                    } catch (error: Exception) {
-                        error.localizedMessage?.let { Log.e("AI error", it) }
+                            var maxScore = -Float.MAX_VALUE
+                            var maxScoreIdx = -1
+                            for (i in scores.indices) {
+                                if (scores[i] > maxScore) {
+                                    maxScore = scores[i]
+                                    maxScoreIdx = i
+                                }
+                            }
+
+                            Log.v("ai result", maxScoreIdx.toString())
+                            val foodInfo = getFoodNameAndCaloriesFromModelResult(context, maxScoreIdx)
+                            resultFoodInfo(foodInfo)
+                        } catch (error: Exception) {
+                            error.localizedMessage?.let { Log.e("AI error", it) }
+                        }
                     }
                 }
+
+
             }
 
             override fun onLoadCleared(placeholder: Drawable?) {
             }
         })
 }
+
+
+object QRCodeDecoder {
+    fun process(bitmap: Bitmap): FoodInfo? {
+        val width = bitmap.width
+        val height = bitmap.height
+        val pixels = IntArray(width * height)
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+
+        val source: LuminanceSource = RGBLuminanceSource(width, height, pixels)
+        val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+        val reader = MultiFormatReader()
+
+        return try {
+            val result = reader.decode(binaryBitmap)
+            val delimiter = ","
+            val parts = result.text.split(delimiter)
+
+            if(parts.size != 5) {
+                null
+            } else {
+                val foodName = parts[0]
+                val calories = parts[1].toInt()
+                val proteins = parts[2].toInt()
+                val carbo = parts[3].toInt()
+                val fats = parts[4].toInt()
+
+                FoodInfo(foodName, calories, proteins, carbo, fats)
+            }
+        } catch (e: Exception) {
+            null //Not a QR code or QR code format is not valid
+        }
+    }
+}
+
+
+
+
+
 
 private fun getFoodNameAndCaloriesFromModelResult(context: Context, score: Int): FoodInfo {
     lateinit var jsonString: String
@@ -350,7 +405,6 @@ private fun addFoodInfoToFirebase(context: Context, foodInfo: FoodInfo, imageUri
         mToast(context, "User is not authenticated.")
     }
 }
-
 
 
 

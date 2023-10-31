@@ -1,0 +1,46 @@
+# Local configuration file (sdk path, etc)
+local.properties
+
+### Android ###
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Generated files
+bin/
+gen/
+out/
+
+# IntelliJ
+*.iml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+
+# Android Studio
+/*/build/
+/*/local.properties
+/*/out
+/*/*/build
+/*/*/production
+*.ipr
+*~
+*.swp
+
+# IntelliJ IDEA
+*.iws
+/out/
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

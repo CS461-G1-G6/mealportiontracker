@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 34
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.jetpackcomposeplayground"
@@ -117,6 +117,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
 
 
+    implementation("com.google.zxing:zxing-parent:3.5.2")
+    implementation ("com.google.zxing:core:3.3.0")
 
 }
 
