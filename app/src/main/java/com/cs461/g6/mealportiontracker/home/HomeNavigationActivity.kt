@@ -2,26 +2,39 @@ package com.cs461.g6.mealportiontracker.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.lightColors
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.cs461.g6.mealportiontracker.R
+import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
-import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
-import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.cs461.g6.mealportiontracker.utils.SessionManager
 
 class HomeNavigationActivity : ComponentActivity() {
@@ -39,6 +52,27 @@ class HomeNavigationActivity : ComponentActivity() {
 
 }
 
+
+val mealColors = lightColors(
+    primary = Color(0xFFFF9C29),
+    primaryVariant = Color(0xFFF8694D),
+    onPrimary = Color(0xFFFFFFFF),
+    secondary = Color(0xFFA1C44D),
+    secondaryVariant = Color(0xFFFFD966),
+    onSecondary = Color(0xFF000000),
+    background = Color(0xFFFDF4DD),
+    onBackground = Color(0xFF000000),
+    surface = Color(0xFFFFDF92),
+    onSurface = Color(0xFF000000),
+    error = Color(0xFFB00020)
+)
+
+
+
+@Composable
+fun MealTheme(children: @Composable () -> Unit) {
+    MaterialTheme(colors = mealColors, content = children)
+}
 
 @Composable
 fun App(sessionManager: SessionManager,
@@ -124,7 +158,7 @@ fun MySnackbar(data: SnackbarData) {
             content = {
                 Text(
                     text = "Hello, World!"
-                )
+                    )
 
             }, action = {
                 if (data.actionLabel != null) {
@@ -141,13 +175,13 @@ fun MyBottomNavBar(
     scaffoldState: ScaffoldState,
     navController: NavHostController
 ) {
-    val listItems = listOf("Profile", "History", "Stats", "Log Meal")
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    val listItems = listOf("Profile", "History", "Stats", "Settings")
+    var selectedIndex by remember { mutableStateOf(0) }
 
     BottomNavigation {
         listItems.forEachIndexed { index, label ->
             BottomNavigationItem(
-                unselectedContentColor =   Color(0x66FFFFFF),
+                unselectedContentColor = mealColors.surface,
                 icon = {
                     when (label) {
                         "Profile" -> Icon(
@@ -166,8 +200,8 @@ fun MyBottomNavBar(
                         )
 
 
-                        "Log Meal" -> Icon(
-                            imageVector = Icons.Filled.Edit,
+                        "Settings" -> Icon(
+                            imageVector = Icons.Filled.Settings,
                             contentDescription = null
                         )
                     }
@@ -182,23 +216,23 @@ fun MyBottomNavBar(
                         0 -> navController.navigate(AppScreen.ScreenProfile.name)
                         1 -> navController.navigate(AppScreen.ScreenHistory.name)
                         2 -> navController.navigate(AppScreen.ScreenStats.name)
-                        3 -> navController.navigate(AppScreen.ScreenManual.name)
+                        3 -> navController.navigate(AppScreen.ScreenSettings.name)
                     }
-//                    scope.launch {
-//                        val result = scaffoldState.snackbarHostState.showSnackbar(
-//                            message = "Clicked$index, $label",
-//                            actionLabel = "OK"
-//                        )
-//                        when (result) {
-//                            SnackbarResult.ActionPerformed -> {
-//                                //Do Something
-//                            }
-//
-//                            SnackbarResult.Dismissed -> {
-//                                //Do Something
-//                            }
-//                        }
-//                    }
+                    scope.launch {
+                        val result = scaffoldState.snackbarHostState.showSnackbar(
+                            message = "Clicked$index, $label",
+                            actionLabel = "OK"
+                        )
+                        when (result) {
+                            SnackbarResult.ActionPerformed -> {
+                                //Do Something
+                            }
+
+                            SnackbarResult.Dismissed -> {
+                                //Do Something
+                            }
+                        }
+                    }
                 },
                 alwaysShowLabel = true
             )
@@ -253,8 +287,8 @@ private fun AppNavHost(
             ScreenStats()
         }
 
-        composable(route = AppScreen.ScreenManual.name) {
-            ScreenManual()
+        composable(route = AppScreen.ScreenSettings.name) {
+            ScreenSettings()
         }
     }
 }

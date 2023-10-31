@@ -4,25 +4,50 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
+import androidx.camera.core.UseCase
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,15 +58,18 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import coil.compose.rememberAsyncImagePainter
-import com.cs461.g6.mealportiontracker.theme.MealTheme
+import coil.compose.rememberImagePainter
+import com.cs461.g6.mealportiontracker.home.mealColors
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.Executor
+import kotlin.concurrent.thread
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -51,9 +79,7 @@ class CameraXPreviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MealTheme {
-                App()
-            }
+            App()
         }
     }
 }
@@ -79,17 +105,25 @@ fun App(modifier: Modifier = Modifier) {
                             Intent(Intent(context, FoodImageProcessingActivity::class.java))
                         intent.putExtra("imageUri", imageUri.toString())
                         context.startActivity(intent)
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = mealColors.primary // Set the background color to the primary color
+                    )
+
+
                 ) {
-                    Text("Process Image", modifier.padding())
+                    Text("Process Image", modifier.padding(), color = mealColors.onPrimary)
                 }
 
                 Button(
                     onClick = {
                         imageUri = EMPTY_IMAGE_URI
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = mealColors.primary // Set the background color to the primary color
+                    )
                 ) {
-                    Text("Remove image", modifier.padding())
+                    Text("Remove image", modifier.padding(), color = mealColors.onPrimary)
                 }
             }
 
@@ -118,9 +152,12 @@ fun App(modifier: Modifier = Modifier) {
                         .padding(4.dp),
                     onClick = {
                         showGallerySelect = true
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = mealColors.primary // Set the background color to the primary color
+                    )
                 ) {
-                    Text("Select from Gallery", modifier = Modifier.padding())
+                    Text("Select from Gallery", modifier = Modifier.padding(), color = mealColors.onPrimary)
                 }
             }
         }
@@ -149,39 +186,49 @@ fun GallerySelect(
         }
     }
 
-    Permission(
-        permission = Manifest.permission.ACCESS_MEDIA_LOCATION,
-        rationale = "You want to read from photo gallery, so I'm going to have to ask for permission.",
-        permissionNotAvailableContent = {
-            Column(modifier) {
-                Text("O noes! No Photo Gallery!")
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    Button(
-                        modifier = Modifier.padding(4.dp),
-                        onClick = {
-                            context.startActivity(
-                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                    data = Uri.fromParts("package", context.packageName, null)
-                                }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        Permission(
+            permission = Manifest.permission.ACCESS_MEDIA_LOCATION,
+            rationale = "You want to read from photo gallery, so I'm going to have to ask for permission.",
+            permissionNotAvailableContent = {
+                Column(modifier) {
+                    Text("O noes! No Photo Gallery!")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        Button(
+                            modifier = Modifier.padding(4.dp),
+                            onClick = {
+                                context.startActivity(
+                                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = Uri.fromParts("package", context.packageName, null)
+                                    }
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = mealColors.primary // Set the background color to the primary color
                             )
+                        ) {
+                            Text("Open Settings", color = mealColors.onPrimary)
                         }
-                    ) {
-                        Text("Open Settings")
-                    }
-                    // If they don't want to grant permissions, this button will result in going back
-                    Button(
-                        modifier = Modifier.padding(4.dp),
-                        onClick = {
-                            onImageUri(EMPTY_IMAGE_URI)
+                        // If they don't want to grant permissions, this button will result in going back
+                        Button(
+                            modifier = Modifier.padding(4.dp),
+                            onClick = {
+                                onImageUri(EMPTY_IMAGE_URI)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = mealColors.primary // Set the background color to the primary color
+                            )
+                        ) {
+                            Text("Use Camera", color = mealColors.onPrimary)
                         }
-                    ) {
-                        Text("Use Camera")
                     }
                 }
-            }
-        },
-    ) {
+            },
+        ) {
+            LaunchGallery()
+        }
+    } else {
         LaunchGallery()
     }
 }
@@ -211,9 +258,12 @@ fun CameraCapture(
                                 data = Uri.fromParts("package", context.packageName, null)
                             }
                         )
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = mealColors.primary // Set the background color to the primary color
+                    )
                 ) {
-                    Text("Open Settings")
+                    Text("Open Settings", color = mealColors.onPrimary)
                 }
             }
         }
@@ -409,6 +459,7 @@ fun CapturePictureButton(
         }
     }
 }
+
 
 
 val EMPTY_IMAGE_URI: Uri = Uri.parse("file://dev/null")

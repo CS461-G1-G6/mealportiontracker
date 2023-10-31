@@ -2,6 +2,7 @@ package com.cs461.g6.mealportiontracker.accounts
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,30 +12,48 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarData
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
+import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
 import com.cs461.g6.mealportiontracker.home.AppScreen
-import com.cs461.g6.mealportiontracker.home.UserAuth
+import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
+import com.cs461.g6.mealportiontracker.home.User
 import com.cs461.g6.mealportiontracker.utils.SessionManager
 import com.google.firebase.auth.*
 import com.google.firebase.database.FirebaseDatabase
+
+
+data class UserAuth(
+    val userId: String,
+    val email: String,
+    val password: String
+)
 
 class UserLogin {
 }
@@ -87,25 +106,30 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
         OutlinedTextField(
             value = password,
             onValueChange = { newPassword -> password = newPassword },
-            label = { Text(text = "Password") }
+            label = { Text(text = "Password") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = PasswordVisualTransformation()
+
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
             isLoading = true // Show the progress dialog
-            FirebaseAuthUtil.loginUserWithEmailAndPassword(email.trim(), password.trim())
+            FirebaseAuthUtil.loginUserWithEmailAndPassword(email.lowercase().trim(), password.trim())
                 .addOnCompleteListener { task ->
                     isLoading = false // Hide the progress dialog
 
                     if (task.isSuccessful) {
-                        // Login successful
                         val user = FirebaseAuthUtil.getCurrentUser()
                         val userId = FirebaseAuthUtil.getCurrentUser()!!.uid
                         mToast(mContext, "Login Successful!")
-                        sessionManager.saveUserData(user!!.uid, user!!.email ?: "", password, true)
+                        sessionManager.saveUserData(user!!.uid, user.email ?: "", password, true)
 
-                        navController.navigate(AppScreen.ScreenProfile.name)
+                        // Go to HomeNavigation
+                        val intent = Intent(mContext, HomeNavigationActivity::class.java)
+                        mContext.startActivity(intent)
+                        //navController.navigate(AppScreen.ScreenProfile.name)
 
                     } else {
                         /*val exception = task.exception
@@ -154,7 +178,7 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
         Button(onClick = {
             isLoading = true // Show the progress dialog
 
-            FirebaseAuthUtil.registerUserWithEmailAndPassword(email.trim(), password.trim())
+            FirebaseAuthUtil.registerUserWithEmailAndPassword(email.trim(), password)
                 .addOnCompleteListener { task ->
                     isLoading = false // Hide the progress dialog
 
@@ -166,7 +190,7 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
                         // Save user data to Realtime Firebase database
                         if (userId != null && userEmail != null) {
                             val databaseReference = FirebaseDatabase.getInstance().getReference("users")
-                            val user = UserAuth(userId, userEmail, password) // Assuming you have a User data class
+                            val user = UserAuth(userId, userEmail.lowercase().trim(), password) // Assuming you have a User data class
 
                             databaseReference.child(userId).setValue(user)
                                 .addOnCompleteListener { saveTask ->

@@ -17,7 +17,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import kotlinx.coroutines.delay
 import com.cs461.g6.mealportiontracker.home.ScreenProfile
-import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.cs461.g6.mealportiontracker.utils.SessionManager
 
 class AccountNavigationActivity : ComponentActivity() {
@@ -34,9 +33,8 @@ class AccountNavigationActivity : ComponentActivity() {
         }
 
         setContent {
-            MealTheme {
-                App(initialRoute, sessionManager)
-            }
+            App(initialRoute, sessionManager)
+            // TODO: Change to Onboarding, Register / Login Navigation
         }
     }
 }

@@ -9,8 +9,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,7 +56,7 @@ fun RotatingSquareComponent() {
             // rememberInfiniteTransition is used to create a transition that uses infitine
             // child animations. Animations typically get invoked as soon as they enter the
             // composition so don't need to be explicitly started.
-            val infiniteTransition = rememberInfiniteTransition(label = "")
+            val infiniteTransition = rememberInfiniteTransition()
 
             // Create a value that is altered by the transition based on the configuration. We use
             // the animated float value the returns and updates a float from the initial value to
@@ -62,7 +69,7 @@ fun RotatingSquareComponent() {
                         durationMillis = 3000,
                         easing = FastOutLinearInEasing,
                     ),
-                ), label = ""
+                )
             )
             // We use the Canvas composable that gives you access to a canvas that you can draw
             // into. We also pass it a modifier.
