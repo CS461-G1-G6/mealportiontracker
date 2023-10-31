@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
-import com.cs461.g6.mealportiontracker.home.mealColors
+import com.cs461.g6.mealportiontracker.theme.mealColors
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.FirebaseApp

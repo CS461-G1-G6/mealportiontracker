@@ -19,7 +19,6 @@ import com.cs461.g6.mealportiontracker.samples.state.backpress.BackPressActivity
 import com.cs461.g6.mealportiontracker.samples.state.coroutine.CoroutineFlowActivity
 import com.cs461.g6.mealportiontracker.samples.state.livedata.LiveDataActivity
 import com.cs461.g6.mealportiontracker.samples.text.*
-import com.cs461.g6.mealportiontracker.theme.DarkModeActivity
 import com.cs461.g6.mealportiontracker.accounts.AccountNavigationActivity
 
 class MainActivity : AppCompatActivity() {
@@ -124,10 +123,6 @@ class MainActivity : AppCompatActivity() {
 
     fun startListAnimation() {
         startActivity(Intent(this, ListAnimationActivity::class.java))
-    }
-
-    fun startThemeExample() {
-        startActivity(Intent(this, DarkModeActivity::class.java))
     }
 
     fun startLayoutModifierExample() {

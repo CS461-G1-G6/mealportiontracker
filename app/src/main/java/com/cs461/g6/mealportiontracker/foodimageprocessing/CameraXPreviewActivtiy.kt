@@ -59,7 +59,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
-import com.cs461.g6.mealportiontracker.home.mealColors
+import com.cs461.g6.mealportiontracker.theme.mealColors
+import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
 import com.google.accompanist.permissions.rememberPermissionState
@@ -79,7 +80,9 @@ class CameraXPreviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App()
+            MealTheme {
+                App()
+            }
         }
     }
 }
