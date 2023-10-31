@@ -3,6 +3,7 @@ package com.cs461.g6.mealportiontracker.core
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.cs461.g6.mealportiontracker.accounts.AccountNavigationActivity
 import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
 import com.cs461.g6.mealportiontracker.samples.animation.Animation1Activity
 import com.cs461.g6.mealportiontracker.samples.animation.Animation2Activity
@@ -47,9 +48,9 @@ class MainActivity : AppCompatActivity() {
             2. (Not Logged In) Sign-in / Sign-in as guest
             3. (Logged In) Home Screen
        */
-        startActivity(Intent(this, HomeNavigationActivity::class.java))
-        //startActivity(Intent(this, AccountNavigationActivity::class.java))
-//        startActivity(Intent(this, AccountNavigationActivity::class.java))
+
+        startActivity(Intent(this, AccountNavigationActivity::class.java))
+ //       startActivity(Intent(this, HomeNavigationActivity::class.java))
 //        setContentView(R.layout.activity_main)
     }
 
