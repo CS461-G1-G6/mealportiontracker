@@ -1,5 +1,6 @@
 package com.cs461.g6.mealportiontracker.home
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
+import java.util.Calendar
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -83,39 +85,67 @@ class Statistics : ComponentActivity() {
 
 @Composable
 fun ScreenStats(sessionManager: SessionManager, navController: NavHostController) {
-
     var totalCalories by remember { mutableStateOf(0) }
     var totalFats by remember { mutableStateOf(0) }
     var totalProteins by remember { mutableStateOf(0) }
     var totalCarbo by remember { mutableStateOf(0) }
     var recommendedCalories by remember { mutableStateOf(0) }
 
-
     val currentUser = FirebaseAuthUtil.getCurrentUser()
-
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
     val date = dateFormat.format(Date())
-
+    var selectedFilter by remember { mutableStateOf("Today") }
     val context = LocalContext.current
 
-    if (currentUser == null) {
-        // Display "No records" when there is no currentUser
-        Text(
-            text = "No records",
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            ),
-            modifier = Modifier.padding(16.dp)
-        )
-    } else {
-        // Display statistics when currentUser is available
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val date = dateFormat.format(Date())
+    var todaySelected by remember { mutableStateOf(true) }
 
-        // Fetch user-specific meal histories and update totals
-        LaunchedEffect(currentUser) {
-            fetchUserMealHistories(currentUser.uid, date) { mealHistories ->
+
+    // Function to calculate the date range for the current week
+    fun calculateDateRangeForWeek(): Pair<String, String> {
+        val calendar = Calendar.getInstance()
+        val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+        calendar.time = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(currentDate)
+
+        // Calculate the start of the week (Monday)
+        val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        val daysToSubtract = if (currentDayOfWeek == Calendar.SUNDAY) 6 else currentDayOfWeek - 2
+        calendar.add(Calendar.DAY_OF_MONTH, -daysToSubtract)
+        val startOfWeekDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time)
+
+        // Calculate the end of the week (Sunday)
+        calendar.add(Calendar.DAY_OF_MONTH, 6)
+        val endOfWeekDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendar.time)
+
+        return Pair(startOfWeekDate, endOfWeekDate)
+    }
+
+
+    val dateLabel = if (selectedFilter == "Today") {
+        "Today"
+    } else {
+        val (startOfWeekDate, endOfWeekDate) = calculateDateRangeForWeek()
+        "$startOfWeekDate - $endOfWeekDate"
+    }
+
+
+    if (currentUser != null) {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+        val currentDate = dateFormat.format(Date())
+        val filterDate: String
+        val endDate: String
+
+        if (selectedFilter == "Today") {
+            filterDate = currentDate
+            endDate = currentDate
+        } else {
+            val (startOfWeekDate, endOfWeekDate) = calculateDateRangeForWeek()
+            filterDate = startOfWeekDate
+            endDate = endOfWeekDate
+        }
+
+
+        LaunchedEffect(currentUser to filterDate to selectedFilter) {
+            fetchUserMealHistories(currentUser.uid, filterDate, endDate) { mealHistories ->
                 val (calories, fats, proteins, carbo) = calculateTotalStatistics(mealHistories)
                 totalCalories = calories
                 totalFats = fats
@@ -125,9 +155,11 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
             fetchUserRecommendedCalories(currentUser.uid) { calories ->
                 recommendedCalories = calories
             }
-
         }
+
+
     }
+
 
     if (totalCalories > 0 || totalFats > 0 || totalProteins > 0 || totalCarbo > 0) {
         val total = totalFats.toFloat() + totalProteins.toFloat() + totalCarbo.toFloat()
@@ -135,133 +167,228 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
         val proteinPercentage = (totalProteins.toFloat() / total) * 100
         val carboPercentage = (totalCarbo.toFloat() / total) * 100
 
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Calories Breakdown",
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                )
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Text(
-                buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Recommended Calories:")
-                    }
-                    append(" $recommendedCalories")
-                }
-            )
-
-            Spacer(modifier = Modifier.height(25.dp))
-
-            // Display the pie chart
-            PieChart(
-                fatPercentage = fatPercentage,
-                proteinPercentage = proteinPercentage,
-                carboPercentage = carboPercentage,
-                modifier = Modifier.size(180.dp)
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                PieChartLegend()
-            }
-
-            Spacer(modifier = Modifier.height(25.dp))
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Total Calories", fontWeight = FontWeight.Bold)
-                    Text("$totalCalories")
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Total Fats (per 100g)", fontWeight = FontWeight.Bold)
-                    Text("$totalFats g")
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Total Proteins (per 100g)", fontWeight = FontWeight.Bold)
-                    Text("$totalProteins g")
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Total Carbohydrates (per 100g)", fontWeight = FontWeight.Bold)
-                    Text("$totalCarbo g")
-                }
-            }
-        }
+        MealStatsContent(
+            totalCalories = totalCalories,
+            totalFats = totalFats,
+            totalProteins = totalProteins,
+            totalCarbo = totalCarbo,
+            recommendedCalories = recommendedCalories,
+            dateLabel = dateLabel,
+            fatPercentage = fatPercentage,
+            proteinPercentage = proteinPercentage,
+            carboPercentage = carboPercentage
+        )
     } else {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "No records found",
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier.padding(16.dp)
-            )
+        NoRecordsFoundContent(context)
+    }
 
-            Button(
-                onClick = {
-                    val intent = Intent(context, CameraXPreviewActivity::class.java)
-                    context.startActivity(intent)
-                },
-                modifier = Modifier.padding(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = mealColors.primary // Set the background color to the primary color
-                )
-            ) {
-                Text("Capture your meal", color = mealColors.onPrimary)
-            }
+    DateFilterButtons(
+        todaySelected = todaySelected,
+        onTodayClicked = {
+            todaySelected = true
+            selectedFilter = "Today"
+        },
+        onThisWeekClicked = {
+            todaySelected = false
+            selectedFilter = "This Week"
+        }
+    )
+
+}
+
+@Composable
+fun DateFilterButtons(
+    todaySelected: Boolean,
+    onTodayClicked: () -> Unit,
+    onThisWeekClicked: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Button(
+            onClick = {
+                onTodayClicked()
+            },
+            modifier = Modifier
+                .weight(1f)
+                .padding(4.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = if (todaySelected) Color.LightGray else Color.Transparent,
+                contentColor = if (todaySelected) Color.Black else Color.Gray
+            ),
+        ) {
+            Text("Today")
+        }
+        Button(
+            onClick = {
+                onThisWeekClicked()
+            },
+            modifier = Modifier
+                .weight(1f)
+                .padding(4.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = if (!todaySelected) Color.LightGray else Color.Transparent,
+                contentColor = if (!todaySelected) Color.Black else Color.Gray
+            ),
+        ) {
+            Text("This Week")
         }
     }
 }
 
-private fun fetchUserMealHistories(userId: String, date: String, callback: (List<FoodInfoWithDate>) -> Unit) {
+@Composable
+fun MealStatsContent(
+    totalCalories: Int,
+    totalFats: Int,
+    totalProteins: Int,
+    totalCarbo: Int,
+    recommendedCalories: Int,
+    dateLabel: String,
+    fatPercentage: Float, // Add the missing parameter
+    proteinPercentage: Float, // Add the missing parameter
+    carboPercentage: Float // Add the missing parameter
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(3.dp)
+    ) {
+        Text(
+            text = "Calories Breakdown",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp
+            )
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        Text(
+            text = dateLabel,
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+            ),
+            modifier = Modifier.padding(8.dp)
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Text(
+            buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Recommended Calories (Per Day):")
+                }
+                append(" $recommendedCalories")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(25.dp))
+
+        // Display the pie chart
+        PieChart(
+            fatPercentage = fatPercentage,
+            proteinPercentage = proteinPercentage,
+            carboPercentage = carboPercentage,
+            modifier = Modifier.size(180.dp)
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            PieChartLegend()
+        }
+
+        Spacer(modifier = Modifier.height(25.dp))
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Total Calories", fontWeight = FontWeight.Bold)
+                Text("$totalCalories")
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Total Fats (per 100g)", fontWeight = FontWeight.Bold)
+                Text("$totalFats g")
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Total Proteins (per 100g)", fontWeight = FontWeight.Bold)
+                Text("$totalProteins g")
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Total Carbohydrates (per 100g)", fontWeight = FontWeight.Bold)
+                Text("$totalCarbo g")
+            }
+        }
+        Spacer(modifier = Modifier.height(45.dp))
+    }
+}
+
+@Composable
+fun NoRecordsFoundContent(context: Context) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(3.dp)
+    ) {
+        Text(
+            text = "No records found",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            ),
+            modifier = Modifier.padding(16.dp)
+        )
+
+        Button(
+            onClick = {
+                val intent = Intent(context, CameraXPreviewActivity::class.java)
+                context.startActivity(intent)
+            },
+            modifier = Modifier.padding(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = mealColors.primary // Set the background color to the primary color
+            )
+        ) {
+            Text("Capture your meal", color = mealColors.onPrimary)
+        }
+    }
+}
+
+
+private fun fetchUserMealHistories(userId: String, startDate: String, endDate: String, callback: (List<FoodInfoWithDate>) -> Unit) {
     val databaseReference = FirebaseDatabase.getInstance().getReference("meal_histories")
     val userQuery: Query = databaseReference.orderByChild("userId").equalTo(userId)
 
@@ -271,9 +398,7 @@ private fun fetchUserMealHistories(userId: String, date: String, callback: (List
             for (dataSnapshot in snapshot.children) {
                 val foodInfoWithDate = dataSnapshot.getValue(FoodInfoWithDate::class.java)
                 foodInfoWithDate?.let {
-                    Log.d("FoodInfoWithDate", "name: ${it.name}, calories: ${it.calories}, proteins: ${it.proteins}, carbo: ${it.carbo}, fats: ${it.fats}")
-                    if (it.date == date) { // Check if the date matches the current date
-                        Log.d("FoodInfoWithDate", "name: ${it.name}, calories: ${it.calories}, proteins: ${it.proteins}, carbo: ${it.carbo}, fats: ${it.fats}")
+                    if (isDateInRange(it.date, startDate, endDate)) {
                         mealHistories.add(it)
                     }
                 }
@@ -286,6 +411,24 @@ private fun fetchUserMealHistories(userId: String, date: String, callback: (List
             callback(emptyList())
         }
     })
+}
+
+
+private fun isDateInRange(date: String, startDate: String, endDate: String): Boolean {
+    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val parsedDate = dateFormat.parse(date)
+    val parsedStartDate = dateFormat.parse(startDate)
+    val parsedEndDate = dateFormat.parse(endDate)
+
+    Log.d("DateDebug", "Date: $date")
+    Log.d("DateDebug", "StartDate: $startDate")
+    Log.d("DateDebug", "EndDate: $endDate")
+
+    // Check if the date is within the range
+    val isInRange = parsedDate in parsedStartDate..parsedEndDate
+    Log.d("DateDebug", "Is in Range: $isInRange")
+
+    return isInRange
 }
 
 
