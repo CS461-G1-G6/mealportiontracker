@@ -1,5 +1,6 @@
 package com.cs461.g6.mealportiontracker.accounts
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,6 +18,7 @@ import kotlinx.coroutines.delay
 import com.cs461.g6.mealportiontracker.home.ScreenProfile
 import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.cs461.g6.mealportiontracker.core.SessionManager
+import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
 
 class AccountNavigationActivity : ComponentActivity() {
 
@@ -25,15 +27,15 @@ class AccountNavigationActivity : ComponentActivity() {
 
         val sessionManager = SessionManager(this)
 
-        val initialRoute = if (sessionManager.getIsUserLoggedIn()) {
-            com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name
+        if (sessionManager.getIsUserLoggedIn()) {
+            val intent = Intent(this, HomeNavigationActivity::class.java)
+            startActivity(intent)
+            finish()
         } else {
-            AppScreen.ScreenSplash.name
-        }
-
-        setContent {
-            MealTheme {
-                App(initialRoute, sessionManager)
+            setContent {
+                MealTheme {
+                    App(AppScreen.ScreenSplash.name, sessionManager)
+                }
             }
         }
     }
