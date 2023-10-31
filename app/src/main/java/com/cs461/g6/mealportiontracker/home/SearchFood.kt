@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Context.MODE_APPEND
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -103,6 +105,10 @@ fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel,
     var query by remember { mutableStateOf(searchText) }
 
     val context = LocalContext.current
+
+    LaunchedEffect(viewModel) {
+        viewModel.refreshData()
+    }
 
     Scaffold(
         topBar = {
@@ -451,5 +457,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+
+    fun refreshData() {
+        Log.d("tag", "refresh")
+        val context: Context = getApplication<Application>().applicationContext
+        val fileName = "food_nutrition.csv"
+
+        // Read data from the file and update originalFoodItemList
+        val updatedOriginalFoodItemList = readInternalCsv(context, fileName)
+        _originalFoodItemList.value = updatedOriginalFoodItemList
+    }
+
 
 }
