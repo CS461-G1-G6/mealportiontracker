@@ -66,6 +66,8 @@ object FirebaseAuthUtil {
                     1
                 }
 
+
+
                 // Create a new MealHistory object
                 val mealHistory = MealHistory(
                     userId,

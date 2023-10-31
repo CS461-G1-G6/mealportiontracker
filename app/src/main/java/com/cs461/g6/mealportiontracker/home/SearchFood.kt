@@ -58,6 +58,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.home.ui.theme.SearchBarComposeTheme
+import com.cs461.g6.mealportiontracker.utils.SessionManager
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -72,17 +73,19 @@ import java.util.*
 
 class SearchFoodActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
+    private val sessionManager: SessionManager by lazy { SessionManager(this) }
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+
             SearchBarComposeTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ScreenSearchFood(navController, viewModel = viewModel)
+                    ScreenSearchFood(navController, viewModel = viewModel, sessionManager)
                 }
             }
         }
@@ -91,7 +94,7 @@ class SearchFoodActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.N)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel) {
+fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel, sessionManager: SessionManager) {
 
     //Collecting states from ViewModel
     val searchText by viewModel.searchText.collectAsState()
@@ -136,7 +139,7 @@ fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel)
                         // Handle adding the food item into the database here
 
                         //Need to ask
-                        val userId = FirebaseAuthUtil.getCurrentUser()!!.uid
+                        val userId = sessionManager.getUserId()!!
 
                         val protein = foodItem.proteins.replace("[^\\d.]".toRegex(), "").toDoubleOrNull() ?: 0.0
 

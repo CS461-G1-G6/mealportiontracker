@@ -305,7 +305,7 @@ private fun AppNavHost(
         }
 
         composable(route = AppScreen.ScreenSearch.name) {
-            ScreenSearchFood(navController, viewModel = viewModel)
+            ScreenSearchFood(navController, viewModel = viewModel, sessionManager)
         }
 
         composable(route = AppScreen.ScreenInput.name) {
