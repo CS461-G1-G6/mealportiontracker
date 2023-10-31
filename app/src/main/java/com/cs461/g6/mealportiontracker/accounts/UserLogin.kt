@@ -42,6 +42,7 @@ import androidx.navigation.NavHostController
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
 import com.cs461.g6.mealportiontracker.home.AppScreen
+import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
 import com.cs461.g6.mealportiontracker.home.User
 import com.cs461.g6.mealportiontracker.utils.SessionManager
 import com.google.firebase.auth.*
@@ -115,23 +116,20 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
 
         Button(onClick = {
             isLoading = true // Show the progress dialog
-            FirebaseAuthUtil.loginUserWithEmailAndPassword(email.toLowerCase().trim(), password.trim())
+            FirebaseAuthUtil.loginUserWithEmailAndPassword(email.lowercase().trim(), password.trim())
                 .addOnCompleteListener { task ->
                     isLoading = false // Hide the progress dialog
 
                     if (task.isSuccessful) {
-                        // Login successful
                         val user = FirebaseAuthUtil.getCurrentUser()
                         val userId = FirebaseAuthUtil.getCurrentUser()!!.uid
                         mToast(mContext, "Login Successful!")
-                        sessionManager.saveUserData(user!!.uid, user!!.email ?: "", password, true)
+                        sessionManager.saveUserData(user!!.uid, user.email ?: "", password, true)
 
-                        navController.navigate(AppScreen.ScreenProfile.name)
-
-                        // For testing
-                        // val intent = Intent(mContext, CameraXPreviewActivity::class.java)
-                        // mContext.startActivity(intent)
-
+                        // Go to HomeNavigation
+                        val intent = Intent(mContext, HomeNavigationActivity::class.java)
+                        mContext.startActivity(intent)
+                        //navController.navigate(AppScreen.ScreenProfile.name)
 
                     } else {
                         /*val exception = task.exception
