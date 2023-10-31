@@ -116,6 +116,9 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
 
+    implementation("com.google.zxing:zxing-parent:3.5.2")
+    implementation ("com.google.zxing:core:3.3.0")
+
 }
 
 tasks.register("prepareKotlinBuildScriptModel"){}
