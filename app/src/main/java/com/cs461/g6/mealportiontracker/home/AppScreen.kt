@@ -12,6 +12,7 @@ enum class AppScreen(val title: String) {
     ScreenStats(title = "Your Progress"),
     //ScreenSettings(title = "Settings"),
     ScreenSearch(title = "Search Food"),
+    ScreenInput(title = "Search Food"),
 
     ScreenDash(title = ""),
     ScreenLog(title = ""),

@@ -3,6 +3,7 @@ package com.cs461.g6.mealportiontracker.home
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.content.Context.MODE_APPEND
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -25,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -60,12 +62,13 @@ import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.BufferedReader
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.io.PrintStream
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class SearchFoodActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
@@ -108,6 +111,11 @@ fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel)
                 },
                 onSearch = {
                     viewModel.onSearchTextChange(query)
+                },
+                onAddClick = {
+                    //val intent = Intent(context, ManualInputActivity::class.java)
+                    //context.startActivity(intent)
+                    navController.navigate(AppScreen.ScreenInput.name)
                 }
             )
         }
@@ -174,7 +182,8 @@ fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel)
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    onSearch: () -> Unit
+    onSearch: () -> Unit,
+    onAddClick: () -> Unit
 ) {
     var searchText by remember { mutableStateOf(query) }
     val bgColor: Color = Color(244, 240, 236)
@@ -185,48 +194,61 @@ fun SearchBar(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        TextField(
-            value = searchText,
-            onValueChange = {
-                searchText = it
-                onQueryChange(it)
-            },
-            placeholder = { Text("Search food...") },
+        Row(
             modifier = Modifier
-                .fillMaxWidth(),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = bgColor,
-                disabledLabelColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            shape = RoundedCornerShape(20.dp),
-            singleLine = true,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = iconColor
-                )
-            },
-            trailingIcon = {
-                if (searchText.isNotEmpty()) {
-                    IconButton(onClick = {
-                        searchText = ""
-                        onQueryChange("")
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                            tint = iconColor
-                        )
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+        ) {
+            TextField(
+                value = searchText,
+                onValueChange = {
+                    searchText = it
+                    onQueryChange(it)
+                },
+                placeholder = { Text("Search food...") },
+                modifier = Modifier
+                    .weight(1f) // Take up remaining space
+                    .padding(end = 8.dp), // Add padding to the end
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = bgColor,
+                    disabledLabelColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(20.dp),
+                singleLine = true,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        tint = iconColor
+                    )
+                },
+                trailingIcon = {
+                    if (searchText.isNotEmpty()) {
+                        IconButton(onClick = {
+                            searchText = ""
+                            onQueryChange("")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = null,
+                                tint = iconColor
+                            )
+                        }
                     }
                 }
+            )
+            // Add button next to the search bar
+            Button(
+                onClick = { onAddClick() }, // Call the provided onAddClick lambda when the button is clicked
+                modifier = Modifier.padding(start = 8.dp, top = 3.dp) // Add padding to the start of the button
+            ) {
+                Text("Add")
             }
-        )
+        }
     }
 }
-
 
 @Composable
 fun FoodItemRow(foodItem: FoodItem, onAddButtonClick: () -> Unit) {
@@ -314,32 +336,93 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val filteredFoodItemList = _filteredFoodItemList.asStateFlow()
 
     init {
-        // Read CSV file and populate countries list during initialization
         val context: Context = application.applicationContext
-        val inputStream: InputStream = context.assets.open("food_nutrition.csv")
-        val foodItems = readCsv(inputStream)
+        val fileName = "food_nutrition.csv"
+
+        val foodItems: List<FoodItem>
+
+        if(isFilePresent(context, fileName)){
+            // File exists in internal storage, read data from it
+            foodItems = readInternalCsv(context, fileName)
+        } else {
+            // Read CSV file from assets folder and populate food list during initialization
+            val inputStream: InputStream = context.assets.open("food_nutrition.csv")
+            foodItems = readCsv(inputStream)
+
+            // Write CSV data to the file in the app's data folder
+            try {
+                val outStream = PrintStream(context.openFileOutput(fileName, MODE_APPEND))
+
+                // Iterate through foodItems and write them to the file
+                for (foodItem in foodItems) {
+                    val line = "\"${foodItem.name}\",${foodItem.calories},${foodItem.proteins},${foodItem.carbs},${foodItem.fats}"
+                    outStream.println(line)
+                }
+
+                // Close the file
+                outStream.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                // Handle the exception (e.g., show an error message to the user)
+            }
+        }
         _originalFoodItemList.value = foodItems
-        _filteredFoodItemList.value = foodItems  // Initialize filtered list with all countries
+        _filteredFoodItemList.value = foodItems  // Initialize filtered list with all food
+
     }
 
-    private fun readCsv(inputStream: InputStream): List<FoodItem> {
+    fun isFilePresent(context: Context, fileName: String): Boolean {
+        val file = File(context.filesDir, fileName)
+        return file.exists()
+    }
+
+    private fun parseCsvLine(line: String): FoodItem? {
+        val foodItemProperties = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
+            .map { it.trim('"') } // Remove quotes from components
+
+        return if (foodItemProperties.size >= 5) {
+            val name = foodItemProperties[0]
+            val calories = foodItemProperties[1].toDoubleOrNull() ?: 0.0
+            val proteins = foodItemProperties[2].trim()
+            val carbs = foodItemProperties[3].trim()
+            val fats = foodItemProperties[4].trim()
+            FoodItem(name, calories, proteins, carbs, fats)
+        } else {
+            null
+        }
+    }
+
+    fun readInternalCsv(context: Context, fileName: String): List<FoodItem> {
+        val result: MutableList<FoodItem> = mutableListOf()
+
+        try {
+            val file = File(context.filesDir, fileName)
+            val fileContents = file.readText()
+
+            val lines = fileContents.split("\n") // Split fileContents into lines
+            for (line in lines) {
+                val foodItem = parseCsvLine(line)
+                foodItem?.let { result.add(it) }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            // Handle IOException (e.g., show an error message to the user)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Handle other exceptions (e.g., show an error message to the user)
+        }
+
+        return result
+    }
+
+    fun readCsv(inputStream: InputStream): List<FoodItem> {
         val result: MutableList<FoodItem> = mutableListOf()
         val reader = BufferedReader(InputStreamReader(inputStream))
         var line: String?
         try {
             while (reader.readLine().also { line = it } != null) {
-                // Process each line of the CSV file and add it to the result list
-                val foodItemProperties = line!!.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
-                    .map { it.trim('"') } // Remove quotes from components
-                if (foodItemProperties.size >= 5) {
-                    val name = foodItemProperties[0]
-                    val calories = foodItemProperties[1].toDoubleOrNull() ?: 0.0
-                    val proteins = foodItemProperties[2].trim()
-                    val carbs = foodItemProperties[3].trim()
-                    val fats = foodItemProperties[4].trim()
-                    val foodItem = FoodItem(name, calories, proteins, carbs, fats)
-                    result.add(foodItem)
-                }
+                val foodItem = parseCsvLine(line!!)
+                foodItem?.let { result.add(it) }
             }
         } catch (e: IOException) {
             e.printStackTrace()
@@ -356,9 +439,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun onSearchTextChange(text: String) {
         _searchText.value = text
 
-        // Filter the countries based on the search text and update the filteredCountriesList
+        // Filter the food based on the search text and update the filteredFoodItemList
         _filteredFoodItemList.value = if (text.isBlank()) {
-            _originalFoodItemList.value // If the search text is empty, show all countries
+            _originalFoodItemList.value // If the search text is empty, show all food
         } else {
             _originalFoodItemList.value.filter { foodItem ->
                 foodItem.name.uppercase().contains(text.trim().uppercase())
@@ -367,204 +450,3 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 }
-
-/*
-private val countries = listOf(
-    "Afghanistan",
-    "Albania",
-    "Algeria",
-    "Andorra",
-    "Angola",
-    "Antigua and Barbuda",
-    "Argentina",
-    "Armenia",
-    "Australia",
-    "Austria",
-    "Azerbaijan",
-    "Bahamas",
-    "Bahrain",
-    "Bangladesh",
-    "Barbados",
-    "Belarus",
-    "Belgium",
-    "Belize",
-    "Benin",
-    "Bhutan",
-    "Bolivia",
-    "Bosnia and Herzegovina",
-    "Botswana",
-    "Brazil",
-    "Brunei",
-    "Bulgaria",
-    "Burkina Faso",
-    "Burundi",
-    "Cambodia",
-    "Cameroon",
-    "Canada",
-    "Cape Verde",
-    "Central African Republic",
-    "Chad",
-    "Chile",
-    "China",
-    "Colombia",
-    "Comoros",
-    "Congo (Brazzaville)",
-    "Congo (Kinshasa)",
-    "Costa Rica",
-    "Croatia",
-    "Cuba",
-    "Cyprus",
-    "Czech Republic",
-    "Denmark",
-    "Djibouti",
-    "Dominica",
-    "Dominican Republic",
-    "Ecuador",
-    "Egypt",
-    "El Salvador",
-    "Equatorial Guinea",
-    "Eritrea",
-    "Estonia",
-    "Eswatini",
-    "Ethiopia",
-    "Fiji",
-    "Finland",
-    "France",
-    "Gabon",
-    "Gambia",
-    "Georgia",
-    "Germany",
-    "Ghana",
-    "Greece",
-    "Grenada",
-    "Guatemala",
-    "Guinea",
-    "Guinea-Bissau",
-    "Guyana",
-    "Haiti",
-    "Holy See",
-    "Honduras",
-    "Hungary",
-    "Iceland",
-    "India",
-    "Indonesia",
-    "Iran",
-    "Iraq",
-    "Ireland",
-    "Israel",
-    "Italy",
-    "Ivory Coast",
-    "Jamaica",
-    "Japan",
-    "Jordan",
-    "Kazakhstan",
-    "Kenya",
-    "Kiribati",
-    "Kuwait",
-    "Kyrgyzstan",
-    "Laos",
-    "Latvia",
-    "Lebanon",
-    "Lesotho",
-    "Liberia",
-    "Libya",
-    "Liechtenstein",
-    "Lithuania",
-    "Luxembourg",
-    "Madagascar",
-    "Malawi",
-    "Malaysia",
-    "Maldives",
-    "Mali",
-    "Malta",
-    "Marshall Islands",
-    "Mauritania",
-    "Mauritius",
-    "Mexico",
-    "Micronesia",
-    "Moldova",
-    "Monaco",
-    "Mongolia",
-    "Montenegro",
-    "Morocco",
-    "Mozambique",
-    "Myanmar",
-    "Namibia",
-    "Nauru",
-    "Nepal",
-    "Netherlands",
-    "New Zealand",
-    "Nicaragua",
-    "Niger",
-    "Nigeria",
-    "North Korea",
-    "North Macedonia",
-    "Norway",
-    "Oman",
-    "Pakistan",
-    "Palau",
-    "Palestine State",
-    "Panama",
-    "Papua New Guinea",
-    "Paraguay",
-    "Peru",
-    "Philippines",
-    "Poland",
-    "Portugal",
-    "Qatar",
-    "Romania",
-    "Russia",
-    "Rwanda",
-    "Saint Kitts and Nevis",
-    "Saint Lucia",
-    "Saint Vincent and the Grenadines",
-    "Samoa",
-    "San Marino",
-    "Sao Tome and Principe",
-    "Saudi Arabia",
-    "Senegal",
-    "Serbia",
-    "Seychelles",
-    "Sierra Leone",
-    "Singapore",
-    "Slovakia",
-    "Slovenia",
-    "Solomon Islands",
-    "Somalia",
-    "South Africa",
-    "South Korea",
-    "South Sudan",
-    "Spain",
-    "Sri Lanka",
-    "Sudan",
-    "Suriname",
-    "Sweden",
-    "Switzerland",
-    "Syria",
-    "Taiwan",
-    "Tajikistan",
-    "Tanzania",
-    "Thailand",
-    "Timor-Leste",
-    "Togo",
-    "Tonga",
-    "Trinidad and Tobago",
-    "Tunisia",
-    "Turkey",
-    "Turkmenistan",
-    "Tuvalu",
-    "Uganda",
-    "Ukraine",
-    "United Arab Emirates",
-    "United Kingdom",
-    "United States of America",
-    "Uruguay",
-    "Uzbekistan",
-    "Vanuatu",
-    "Venezuela",
-    "Vietnam",
-    "Yemen",
-    "Zambia",
-    "Zimbabwe"
-)
-*/

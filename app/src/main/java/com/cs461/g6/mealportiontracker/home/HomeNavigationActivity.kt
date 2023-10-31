@@ -307,6 +307,11 @@ private fun AppNavHost(
         composable(route = AppScreen.ScreenSearch.name) {
             ScreenSearchFood(navController, viewModel = viewModel)
         }
+
+        composable(route = AppScreen.ScreenInput.name) {
+            val inputViewModel = viewModel<InputViewModel>()
+            ScreenManualInput(navController, inputViewModel,  context = LocalContext.current)
+        }
     }
 }
 
