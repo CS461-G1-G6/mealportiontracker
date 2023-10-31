@@ -2,6 +2,7 @@ package com.cs461.g6.mealportiontracker.home
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,8 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.runtime.Composable
@@ -94,8 +97,6 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
     var recommendedCalories by remember { mutableStateOf(0) }
 
     val currentUser = FirebaseAuthUtil.getCurrentUser()
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-    val date = dateFormat.format(Date())
     var selectedFilter by remember { mutableStateOf("Today") }
     val context = LocalContext.current
 
@@ -122,12 +123,12 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
     }
 
 
-    val dateLabel = if (selectedFilter == "Today") {
-        "Today"
-    } else {
-        val (startOfWeekDate, endOfWeekDate) = calculateDateRangeForWeek()
-        "$startOfWeekDate - $endOfWeekDate"
-    }
+//    val dateLabel = if (selectedFilter == "Today") {
+//        "Today"
+//    } else {
+//        val (startOfWeekDate, endOfWeekDate) = calculateDateRangeForWeek()
+//        "$startOfWeekDate - $endOfWeekDate"
+//    }
 
 
     if (currentUser != null) {
@@ -162,38 +163,65 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
 
     }
 
+    val scrollState = rememberScrollState()
+    val configuration = LocalConfiguration.current
+    val portraitHeight = 320.dp
+    val landscapeHeight = 670.dp
 
-    if (totalCalories > 0 || totalFats > 0 || totalProteins > 0 || totalCarbo > 0) {
-        val total = totalFats.toFloat() + totalProteins.toFloat() + totalCarbo.toFloat()
-        val fatPercentage = (totalFats.toFloat() / total) * 100
-        val proteinPercentage = (totalProteins.toFloat() / total) * 100
-        val carboPercentage = (totalCarbo.toFloat() / total) * 100
-
-        MealStatsContent(
-            totalCalories = totalCalories,
-            totalFats = totalFats,
-            totalProteins = totalProteins,
-            totalCarbo = totalCarbo,
-            recommendedCalories = recommendedCalories,
-            fatPercentage = fatPercentage,
-            proteinPercentage = proteinPercentage,
-            carboPercentage = carboPercentage
-        )
+    val height = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        landscapeHeight
     } else {
-        NoRecordsFoundContent(context)
+        portraitHeight
     }
 
-    DateFilterButtons(
-        todaySelected = todaySelected,
-        onTodayClicked = {
-            todaySelected = true
-            selectedFilter = "Today"
-        },
-        onThisWeekClicked = {
-            todaySelected = false
-            selectedFilter = "This Week"
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(3.dp)
+            .verticalScroll(state = scrollState)
+            .height(height)
+            .padding(bottom=20.dp)
+    ) {
+        // Put your DateFilterButtons inside the Column
+        DateFilterButtons(
+            todaySelected = todaySelected,
+            onTodayClicked = {
+                todaySelected = true
+                selectedFilter = "Today"
+            },
+            onThisWeekClicked = {
+                todaySelected = false
+                selectedFilter = "This Week"
+            }
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+
+        if (totalCalories > 0 || totalFats > 0 || totalProteins > 0 || totalCarbo > 0) {
+            val total = totalFats.toFloat() + totalProteins.toFloat() + totalCarbo.toFloat()
+            val fatPercentage = (totalFats.toFloat() / total) * 100
+            val proteinPercentage = (totalProteins.toFloat() / total) * 100
+            val carboPercentage = (totalCarbo.toFloat() / total) * 100
+
+            // Put your MealStatsContent inside the Column
+            MealStatsContent(
+                totalCalories = totalCalories,
+                totalFats = totalFats,
+                totalProteins = totalProteins,
+                totalCarbo = totalCarbo,
+                recommendedCalories = recommendedCalories,
+                fatPercentage = fatPercentage,
+                proteinPercentage = proteinPercentage,
+                carboPercentage = carboPercentage
+            )
+
+        } else {
+            // Put your NoRecordsFoundContent inside the Column
+            NoRecordsFoundContent(context)
         }
-    )
+
+//        Spacer(modifier = Modifier.height(25.dp))
+    }
 
 }
 
@@ -259,7 +287,6 @@ fun MealStatsContent(
             .fillMaxSize()
             .padding(3.dp)
     ) {
-
 
         Text(
             buildAnnotatedString {
