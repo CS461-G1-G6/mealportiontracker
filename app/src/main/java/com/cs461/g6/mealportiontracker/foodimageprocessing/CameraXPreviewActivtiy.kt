@@ -175,12 +175,17 @@ fun GallerySelect(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            onImageUri(uri ?: EMPTY_IMAGE_URI)
+            if (uri != null) {
+                Log.d("SelectedImageUri", uri.toString())
+                onImageUri(uri)
+            }
         }
+
     )
 
     @Composable
     fun LaunchGallery() {
+        Log.d("Gallery Select", "Gallery Selected")
         SideEffect {
             launcher.launch("image/*")
         }

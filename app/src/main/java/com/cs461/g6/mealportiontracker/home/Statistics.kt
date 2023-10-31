@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -31,14 +32,15 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
-import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
 import java.util.Calendar
 import kotlin.math.cos
 import kotlin.math.sin
@@ -173,7 +175,6 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
             totalProteins = totalProteins,
             totalCarbo = totalCarbo,
             recommendedCalories = recommendedCalories,
-            dateLabel = dateLabel,
             fatPercentage = fatPercentage,
             proteinPercentage = proteinPercentage,
             carboPercentage = carboPercentage
@@ -210,31 +211,32 @@ fun DateFilterButtons(
                 onTodayClicked()
             },
             modifier = Modifier
-                .weight(1f)
-                .padding(4.dp),
+                .weight(1f).padding(start = 5.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (todaySelected) Color.LightGray else Color.Transparent,
-                contentColor = if (todaySelected) Color.Black else Color.Gray
+                backgroundColor = if (todaySelected) mealColors.primary else Color.Transparent,
+                contentColor = if (todaySelected) mealColors.onPrimary else mealColors.primary
             ),
+            border = BorderStroke(4.dp, if (todaySelected) Color.Transparent else mealColors.primary)
         ) {
-            Text("Today")
+            Text("Today", modifier = Modifier.padding(3.dp))
         }
         Button(
             onClick = {
                 onThisWeekClicked()
             },
             modifier = Modifier
-                .weight(1f)
-                .padding(4.dp),
+                .weight(1f).padding(end = 5.dp),
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = if (!todaySelected) Color.LightGray else Color.Transparent,
-                contentColor = if (!todaySelected) Color.Black else Color.Gray
+                backgroundColor = if (!todaySelected) mealColors.primary else Color.Transparent,
+                contentColor = if (!todaySelected) mealColors.onPrimary else mealColors.primary
             ),
+            border = BorderStroke(4.dp, if (!todaySelected) Color.Transparent else mealColors.primary)
         ) {
-            Text("This Week")
+            Text("This Week", modifier = Modifier.padding(3.dp))
         }
     }
 }
+
 
 @Composable
 fun MealStatsContent(
@@ -243,11 +245,13 @@ fun MealStatsContent(
     totalProteins: Int,
     totalCarbo: Int,
     recommendedCalories: Int,
-    dateLabel: String,
-    fatPercentage: Float, // Add the missing parameter
-    proteinPercentage: Float, // Add the missing parameter
-    carboPercentage: Float // Add the missing parameter
+    fatPercentage: Float,
+    proteinPercentage: Float,
+    carboPercentage: Float
 ) {
+
+    val configuration = LocalConfiguration.current
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -255,25 +259,7 @@ fun MealStatsContent(
             .fillMaxSize()
             .padding(3.dp)
     ) {
-        Text(
-            text = "Calories Breakdown",
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
-        )
 
-        Spacer(modifier = Modifier.height(5.dp))
-
-        Text(
-            text = dateLabel,
-            style = TextStyle(
-                fontWeight = FontWeight.Bold,
-            ),
-            modifier = Modifier.padding(8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
 
         Text(
             buildAnnotatedString {
@@ -286,12 +272,18 @@ fun MealStatsContent(
 
         Spacer(modifier = Modifier.height(25.dp))
 
+        val pieChartSizePercentage = 0.4f  // Adjust this value as needed
+
+        // Calculate the PieChart size based on the screen width
+        val screenWidth = configuration.screenWidthDp
+        val pieChartSize = (screenWidth * pieChartSizePercentage).dp
+
         // Display the pie chart
         PieChart(
             fatPercentage = fatPercentage,
             proteinPercentage = proteinPercentage,
             carboPercentage = carboPercentage,
-            modifier = Modifier.size(180.dp)
+            modifier = Modifier.size(pieChartSize)
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -350,9 +342,9 @@ fun MealStatsContent(
                 Text("$totalCarbo g")
             }
         }
-        Spacer(modifier = Modifier.height(45.dp))
     }
 }
+
 
 @Composable
 fun NoRecordsFoundContent(context: Context) {
@@ -371,19 +363,6 @@ fun NoRecordsFoundContent(context: Context) {
             ),
             modifier = Modifier.padding(16.dp)
         )
-
-        Button(
-            onClick = {
-                val intent = Intent(context, CameraXPreviewActivity::class.java)
-                context.startActivity(intent)
-            },
-            modifier = Modifier.padding(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = mealColors.primary // Set the background color to the primary color
-            )
-        ) {
-            Text("Capture your meal", color = mealColors.onPrimary)
-        }
     }
 }
 

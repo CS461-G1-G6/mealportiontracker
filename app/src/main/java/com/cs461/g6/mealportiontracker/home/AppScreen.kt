@@ -9,7 +9,7 @@ enum class AppScreen(val title: String) {
     //Bottom Navigation Tabs
     ScreenProfile(title = "Profile"),
     ScreenHistory(title = "Your Meal History"),
-    ScreenStats(title = "Your Progress"),
+    ScreenStats(title = "Your Calories Breakdown"),
     ScreenSettings(title = "Settings"),
 
     ScreenDash(title = ""),

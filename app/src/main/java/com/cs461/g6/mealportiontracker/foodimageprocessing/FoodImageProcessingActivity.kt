@@ -37,9 +37,12 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.FirebaseApp
 import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import com.bumptech.glide.request.transition.Transition
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
+import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
 import com.cs461.g6.mealportiontracker.home.Statistics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -89,63 +92,88 @@ class FoodImageProcessingActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }
+
 
 @Composable
 fun App(imageUri: String) {
     val context = LocalContext.current
     var foodInfo by remember { mutableStateOf<FoodInfo?>(null) }
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.background(mealColors.background)
     ) {
-        if (foodInfo != null) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = rememberImagePainter(data = imageUri),
-                    contentDescription = null, // Set a meaningful content description
-                    modifier = Modifier.fillMaxWidth().height(200.dp)
-                )
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(3.dp)
+        ) {
+            if (foodInfo != null) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Image(
+                        painter = rememberImagePainter(data = imageUri),
+                        contentDescription = null, // Set a meaningful content description
+                        modifier = Modifier.fillMaxWidth().height(200.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    FoodInfoRow("Food Name", foodInfo!!.name)
+                    FoodInfoRow("Calories (Per 100g)", foodInfo!!.calories.toString())
+                    FoodInfoRow("Proteins (Per 100g)", foodInfo!!.proteins.toString())
+                    FoodInfoRow("Carbohydrates (Per 100g)", foodInfo!!.carbo.toString())
+                    FoodInfoRow("Fats (Per 100g)", foodInfo!!.fats.toString())
+                }
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                FoodInfoRow("Food Name", foodInfo!!.name)
-                FoodInfoRow("Calories (Per 100g)", foodInfo!!.calories.toString())
-                FoodInfoRow("Proteins (Per 100g)", foodInfo!!.proteins.toString())
-                FoodInfoRow("Carbohydrates (Per 100g)", foodInfo!!.carbo.toString())
-                FoodInfoRow("Fats (Per 100g)", foodInfo!!.fats.toString())
-            }
-
-            // Add your button here
-            Button(
-                onClick = {
-                    if (foodInfo != null) {
-                        addFoodInfoToFirebase(context, foodInfo!!, imageUri)
-
-                    } else {
-                        mToast(context, "No Food information")
+                // Add your button here
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 15.dp),
+                ) {
+                    Button(
+                        onClick = {
+                            if (foodInfo != null) {
+                                addFoodInfoToFirebase(context, foodInfo!!, imageUri)
+                            } else {
+                                mToast(context, "No Food information")
+                            }
+                        },
+                        modifier = Modifier.padding(8.dp).weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = mealColors.primary
+                        )
+                    ) {
+                        Text("Add Food", color = mealColors.onPrimary)
                     }
-                },
-                modifier = Modifier.padding(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = mealColors.primary // Set the background color to the primary color
-                )
-            ) {
-                Text("Add Food", color = mealColors.onPrimary)
 
+                    Button(
+                        onClick = {
+                            val intent = Intent(context, CameraXPreviewActivity::class.java)
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.padding(8.dp).weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = mealColors.primary
+                        )
+                    ) {
+                        Text("Capture Food", color = mealColors.onPrimary)
+                    }
+                }
+
+
+            } else {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
-
-        } else {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
         }
     }
+
 
     LaunchedEffect(key1 = Unit) {
         processFoodImage(context, imageUri) { resultFoodInfo ->
@@ -157,8 +185,10 @@ fun App(imageUri: String) {
 @Composable
 fun FoodInfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
-//        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = "$label: ",
@@ -382,7 +412,8 @@ private fun addFoodInfoToFirebase(context: Context, foodInfo: FoodInfo, imageUri
                                     // Data was successfully saved to the database
                                     // You can add any further logic here if needed
                                     mToast(context, "Food information added to the database!")
-                                    val intent = Intent(context, Statistics::class.java)
+
+                                    val intent = Intent(context, HomeNavigationActivity::class.java)
                                     context.startActivity(intent)
                                 } else {
                                     // Handle database save failure
