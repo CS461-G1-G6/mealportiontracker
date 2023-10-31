@@ -6,19 +6,19 @@ import androidx.appcompat.app.AppCompatActivity
 import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
 import com.cs461.g6.mealportiontracker.samples.animation.*
 import com.cs461.g6.mealportiontracker.samples.customview.*
-import com.cs461.g6.mealportiontracker.samples.image.ImageActivity
-import com.cs461.g6.mealportiontracker.samples.interop.ComposeInClassicAndroidActivity
 import com.cs461.g6.mealportiontracker.samples.layout.*
 import com.cs461.g6.mealportiontracker.samples.material.*
+import com.cs461.g6.mealportiontracker.samples.stack.*
+import com.cs461.g6.mealportiontracker.samples.text.*
+import com.cs461.g6.mealportiontracker.samples.image.ImageActivity
+import com.cs461.g6.mealportiontracker.samples.interop.ComposeInClassicAndroidActivity
 import com.cs461.g6.mealportiontracker.samples.scrollers.HorizontalScrollableActivity
 import com.cs461.g6.mealportiontracker.samples.scrollers.VerticalScrollableActivity
-import com.cs461.g6.mealportiontracker.samples.stack.*
 import com.cs461.g6.mealportiontracker.samples.state.ProcessDeathActivity
 import com.cs461.g6.mealportiontracker.samples.state.StateActivity
 import com.cs461.g6.mealportiontracker.samples.state.backpress.BackPressActivity
 import com.cs461.g6.mealportiontracker.samples.state.coroutine.CoroutineFlowActivity
 import com.cs461.g6.mealportiontracker.samples.state.livedata.LiveDataActivity
-import com.cs461.g6.mealportiontracker.samples.text.*
 import com.cs461.g6.mealportiontracker.accounts.AccountNavigationActivity
 
 class MainActivity : AppCompatActivity() {
@@ -26,13 +26,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /* TODO: Different starting screens if
-            2. (Not Logged In) Sign-in / Sign-in as guest
-            3. (Logged In) Home Screen
-       */
         // startActivity(Intent(this, HomeNavigationActivity::class.java))
         startActivity(Intent(this, AccountNavigationActivity::class.java))
-//        startActivity(Intent(this, AccountNavigationActivity::class.java))
 //        setContentView(R.layout.activity_main)
     }
 

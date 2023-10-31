@@ -1,8 +1,7 @@
-package com.cs461.g6.mealportiontracker.utils
+package com.cs461.g6.mealportiontracker.core
 
 import android.content.Context
 import android.content.SharedPreferences
-
 
 class SessionManager(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)

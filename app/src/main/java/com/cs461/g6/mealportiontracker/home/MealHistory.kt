@@ -9,15 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-class MealHistory {
-}
-
-// TODO: Add Calendar Picker and two tabs (calendar + list, progress graph)
 
 @Composable
 fun ScreenHistory(
 ) {
-    var buttonTxt = "Historyy"
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -26,20 +21,9 @@ fun ScreenHistory(
             .padding(16.dp)
     ) {
         Text(
-            text = buttonTxt,
+            text = "Meal History",
             style = MaterialTheme.typography.h5
         )
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                buttonTxt = "heloo"
-            }
-            ,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Navigate to Screen B")
-        }
     }
 }

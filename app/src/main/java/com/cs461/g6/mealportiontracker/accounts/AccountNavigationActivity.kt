@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +16,7 @@ import androidx.navigation.compose.*
 import kotlinx.coroutines.delay
 import com.cs461.g6.mealportiontracker.home.ScreenProfile
 import com.cs461.g6.mealportiontracker.theme.MealTheme
-import com.cs461.g6.mealportiontracker.utils.SessionManager
+import com.cs461.g6.mealportiontracker.core.SessionManager
 
 class AccountNavigationActivity : ComponentActivity() {
 
@@ -63,32 +61,6 @@ fun App(initialRoute: String,
     }
 }
 
-
-// ---------------------------- Main App's Top App Bar
-@Composable
-private fun MyTopAppBar(
-    currentScreen: AppScreen,
-    canNavigateBack: Boolean,
-    navigateUp: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    TopAppBar(
-        title = {
-            Text(text = currentScreen.title)
-        },
-        modifier = modifier,
-        navigationIcon = if (canNavigateBack) {
-            {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back"
-                    )
-                }
-            }
-        } else null,
-    )
-}
 
 // ---------------------------- Manages the navigation between pages
 @Composable

@@ -2,42 +2,29 @@ package com.cs461.g6.mealportiontracker.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.lightColors
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.cs461.g6.mealportiontracker.R
 import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.cs461.g6.mealportiontracker.theme.mealColors
-import com.cs461.g6.mealportiontracker.utils.SessionManager
+import com.cs461.g6.mealportiontracker.core.SessionManager
+import kotlinx.coroutines.launch
 
 class HomeNavigationActivity : ComponentActivity() {
 
@@ -60,7 +47,7 @@ fun App(sessionManager: SessionManager,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = AppScreen.valueOf(
-        backStackEntry?.destination?.route ?: AppScreen.ScreenA.name
+        backStackEntry?.destination?.route ?: AppScreen.ScreenProfile.name
     )
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -69,7 +56,7 @@ fun App(sessionManager: SessionManager,
         scaffoldState = scaffoldState,
         // --------------- TOP BAR
         topBar = {
-            MyTopAppBar(
+            HomeTopBar(
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() }
@@ -77,12 +64,12 @@ fun App(sessionManager: SessionManager,
         },
         // --------------- BOTTOM NAVIGATION
         bottomBar = {
-            MyBottomNavBar(scope, scaffoldState, navController)
+            HomeBottomBar(scope, scaffoldState, navController)
         },
 
         // --------------- FLOATING BUTTON
         floatingActionButton = {
-            MyBottomNavBarFAB()
+            HomeBottomFAB()
         },
 
         // --------------- SNACKBAR HOST
@@ -106,7 +93,7 @@ fun App(sessionManager: SessionManager,
 
 // ---------------------------- Main App's Top App Bar
 @Composable
-private fun MyTopAppBar(
+private fun HomeTopBar(
     currentScreen: AppScreen,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
@@ -133,11 +120,12 @@ private fun MyTopAppBar(
 
 @Composable
 fun MySnackbar(data: SnackbarData) {
+   var snackbarMessage = "Alert"
     Card(shape = RoundedCornerShape(4.dp), modifier = Modifier.padding(8.dp)) {
         Snackbar(
             content = {
                 Text(
-                    text = "Hello, World!"
+                    text = snackbarMessage
                     )
 
             }, action = {
@@ -149,13 +137,15 @@ fun MySnackbar(data: SnackbarData) {
     }
 }
 
+
+
 @Composable
-fun MyBottomNavBar(
+fun HomeBottomBar(
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     navController: NavHostController
 ) {
-    val listItems = listOf("Profile", "History", "Stats", "Settings")
+    val listItems = listOf("Profile", "History", "Forums", "Stats", "Log Meal")
     var selectedIndex by remember { mutableStateOf(0) }
 
     BottomNavigation {
@@ -174,14 +164,19 @@ fun MyBottomNavBar(
                             contentDescription = null
                         )
 
-                        "Stats" -> Icon(
-                            painter = painterResource(id = R.drawable.ic_piechart),
-                            contentDescription = "Stats"
+                        "Forums" -> Icon(
+                            imageVector = Icons.Filled.ChatBubble,
+                            contentDescription = "Forums"
                         )
 
 
-                        "Settings" -> Icon(
-                            imageVector = Icons.Filled.Settings,
+                        "Stats" -> Icon(
+                            imageVector = Icons.Filled.BarChart,
+                            contentDescription = null
+                        )
+
+                        "Log Meal" -> Icon(
+                            imageVector = Icons.Filled.Fastfood,
                             contentDescription = null
                         )
                     }
@@ -195,24 +190,27 @@ fun MyBottomNavBar(
                     when (index) {
                         0 -> navController.navigate(AppScreen.ScreenProfile.name)
                         1 -> navController.navigate(AppScreen.ScreenHistory.name)
-                        2 -> navController.navigate(AppScreen.ScreenStats.name)
-                        3 -> navController.navigate(AppScreen.ScreenSettings.name)
+                        2 -> navController.navigate(AppScreen.ScreenForums.name)
+                        3 -> navController.navigate(AppScreen.ScreenStats.name)
+                        4 -> navController.navigate(AppScreen.ScreenAddMeal.name)
                     }
-                    scope.launch {
-                        val result = scaffoldState.snackbarHostState.showSnackbar(
-                            message = "Clicked$index, $label",
-                            actionLabel = "OK"
-                        )
-                        when (result) {
-                            SnackbarResult.ActionPerformed -> {
-                                //Do Something
-                            }
 
-                            SnackbarResult.Dismissed -> {
-                                //Do Something
-                            }
-                        }
-                    }
+                    // ----- SNACKBAR, REMOVE IF NOT NEEDED
+//                    scope.launch {
+//                        val result = scaffoldState.snackbarHostState.showSnackbar(
+//                            message = "Clicked$index, $label",
+//                            actionLabel = "OK"
+//                        )
+//                        when (result) {
+//                            SnackbarResult.ActionPerformed -> {
+//                                //Do Something
+//                            }
+//
+//                            SnackbarResult.Dismissed -> {
+//                                //Do Something
+//                            }
+//                        }
+//                    }
                 },
                 alwaysShowLabel = true
             )
@@ -221,7 +219,7 @@ fun MyBottomNavBar(
 }
 
 @Composable
-fun MyBottomNavBarFAB() {
+fun HomeBottomFAB() {
     val context = LocalContext.current
     FloatingActionButton(
         onClick = {
@@ -267,8 +265,12 @@ private fun AppNavHost(
             ScreenStats()
         }
 
-        composable(route = AppScreen.ScreenSettings.name) {
-            ScreenSettings()
+        composable(route = AppScreen.ScreenForums.name) {
+            ScreenForums()
+        }
+
+        composable(route = AppScreen.ScreenAddMeal.name) {
+            ScreenAddMeal()
         }
     }
 }

@@ -17,10 +17,12 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -118,6 +120,8 @@ dependencies {
 
     implementation("com.google.zxing:zxing-parent:3.5.2")
     implementation ("com.google.zxing:core:3.3.0")
+
+    implementation("androidx.compose.material:material-icons-extended")
 
 }
 
