@@ -37,7 +37,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.foodimageprocessing.CameraXPreviewActivity
@@ -95,6 +97,11 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        Text(
+            text = "Calories Tracker",
+            fontSize = 25.sp,
+            textAlign = TextAlign.Center
+        )
         OutlinedTextField(
             value = email,
             onValueChange = { newEmail -> email = newEmail },

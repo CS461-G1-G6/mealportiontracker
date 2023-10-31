@@ -124,10 +124,6 @@ private fun AppNavHost(navController: NavHostController, sessionManager: Session
         composable(route = com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name) {
             ScreenProfile(sessionManager, navController)
         }
-
         // Add other composables/routes here
-
     }
 }
-
-
