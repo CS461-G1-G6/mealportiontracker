@@ -1,33 +1,36 @@
 package com.cs461.g6.mealportiontracker.home
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.cs461.g6.mealportiontracker.accounts.AppScreen
+import com.cs461.g6.mealportiontracker.accounts.AccountNavigationActivity
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
+import com.cs461.g6.mealportiontracker.core.FoodItem
 import com.cs461.g6.mealportiontracker.foodimageprocessing.mToast
 import com.cs461.g6.mealportiontracker.core.SessionManager
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
-
-data class UserAuth(
-    val userId: String,
-    val email: String,
-    val password: String
-)
+var RefreshButtonClickFlag = false
 
 data class User(
     val userId: String,
@@ -40,16 +43,36 @@ data class User(
     val activity:Float?
 )
 
-val dummyUser = User(
-    userId = "123",
-    email = "aj@example.com",
-    weight = 0.0f,
-    height = 0.0f,
-    recommendedCalories = 0.0f,
-    age = 20,
-    gender = "F",
-    activity = 1.2f
-)
+
+fun readCsv(context: Context, fileName: String): List<FoodItem> {
+    val result: MutableList<FoodItem> = mutableListOf()
+
+    try {
+        val inputStream = context.assets.open(fileName)
+        val reader = BufferedReader(InputStreamReader(inputStream))
+        var line: String?
+
+        while (reader.readLine().also { line = it } != null) {
+            // Process each line of the CSV file and add it to the result list
+            val foodItemProperties = line!!.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*\$)".toRegex())
+                .map { it.trim('"') } // Remove quotes from components
+            if (foodItemProperties.size >= 5) {
+                val name = foodItemProperties[0]
+                val calories = foodItemProperties[1].toDoubleOrNull() ?: 0.0
+                val proteins = foodItemProperties[2].trim()
+                val carbs = foodItemProperties[3].trim()
+                val fats = foodItemProperties[4].trim()
+                val foodItem = FoodItem(name, calories, proteins, carbs, fats)
+                result.add(foodItem)
+            }
+        }
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+
+    return result
+}
+
 
 private fun fetchUserProfile(sessionManager: SessionManager, callback: (User?) -> Unit) {
     val databaseReference = FirebaseDatabase.getInstance().getReference("users")
@@ -122,6 +145,18 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
     var user_profile by remember { mutableStateOf<User?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
+    val context: Context = mContext
+    val fileName = "food_nutrition.csv"
+    val foodItems = readCsv(context, fileName)
+    val recommendedFoodList = mutableListOf<FoodItem>()
+
+    var showRecommendedFoods by remember { mutableStateOf(true) }
+    var refreshed by remember { mutableStateOf(false) }
+
+    for (foodItem in foodItems) {
+        recommendedFoodList.add(foodItem)
+    }
+
     LaunchedEffect(isLoading) {
         fetchUserProfile(sessionManager) { fetchedUser ->
             if (fetchedUser != null) {
@@ -144,10 +179,10 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
         val radioOptions = listOf("M", "F")
         val activityOptions = listOf(
             1.2 to "Sedentary (little or no exercise)",
-            1.375 to "lightly active (light exercise/sports 1-3 days/week)",
-            1.55 to "moderately active (moderate exercise/sports 3-5 days/week)",
-            1.725 to "very active (hard exercise/sports 6-7 days a week)",
-            1.9 to "extra active (very hard exercise/sports & physical job or 2x training)"
+            1.375 to "Lightly active (light exercise/sports 1-3 days/week)",
+            1.55 to "Moderately active (moderate exercise/sports 3-5 days/week)",
+            1.725 to "Very active (hard exercise/sports 6-7 days a week)",
+            1.9 to "Extra active (very hard exercise/sports & physical job or 2x training)"
         )
         var (selectedOption, onOptionSelected) = remember { mutableStateOf(user_profile?.gender ?: "M") }
         Log.i("activee", user_profile?.activity.toString())
@@ -162,11 +197,11 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                 .verticalScroll(rememberScrollState())
         )
         {
-            Text(text = "Email: ${sessionManager.getUserEmail()}")
+            Text(text = "Email: ${sessionManager.getUserEmail()}", fontSize = 18.sp)
             Spacer(modifier = Modifier.height(36.dp))
             Text(text = "Calories Recommender", fontSize = 24.sp)
             Spacer(modifier = Modifier.height(12.dp))
-            Text(text="Your Gender:")
+            Text(text="Your Gender:", fontSize = 18.sp)
             radioOptions.forEach { text ->
                 Row(
                     modifier = Modifier
@@ -231,7 +266,7 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                 placeholder = { Text(if (height != null && height > 0) height.toString() + " cm" else "Enter Height in cm") }
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text="How Active are you:")
+            Text(text="How Active are you:", fontSize = 18.sp)
             activityRadioButton(
                 options = activityOptions,
                 selectedActivity = selectedActivity
@@ -277,6 +312,7 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                         } else {
                             recommendedCalories = recommendedCaloriesDb
                             mToast(mContext, "Successfully Updated Information")
+                            RefreshButtonClickFlag = true
                         }
                     }
                 }
@@ -284,22 +320,110 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                 Text("Update Information")
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Recommended Calories: " + recommendedCalories.toString(), fontSize = 24.sp)
+            Text(text = "Recommended Calories: " + recommendedCalories.toString(), fontSize = 18.sp, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Recommended Food", fontSize = 18.sp, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(8.dp))
+            if (showRecommendedFoods ) {
+                RecommendedFoodListRow(recommendedFoodList, recommendedCalories)
+
+            }
+            Button(
+                onClick = {
+                    RefreshButtonClickFlag = true
+                    refreshed = true
+                    showRecommendedFoods = false
+
+
+                }
+            ) {
+                Text("Refresh Recommended Foods")
+            }
+            Spacer(modifier = Modifier.height(30.dp))
             // SignOut Button
             Button(onClick = {
                 // Sign out user from Firebase and clear session
                 FirebaseAuthUtil.signOut()
                 sessionManager.clearUserData()
-                navController.navigate(AppScreen.ScreenLogin.name) {
-                    // Clear the back stack to prevent going back to the profile screen
-                    popUpTo(navController.graph.startDestinationRoute!!) {
-                        inclusive = false
-                    }
-                }
-            }) {
+                // Go to HomeNavigation
+                val intent = Intent(mContext, AccountNavigationActivity::class.java)
+                mContext.startActivity(intent)
+//                navController.navigate(AppScreen.ScreenLogin.name) {
+//                    // Clear the back stack to prevent going back to the profile screen
+//                    popUpTo(navController.graph.startDestinationRoute!!) {
+//                        inclusive = false
+//                    }
+//
+//                }
+            }, modifier = Modifier.align(Alignment.Start)) {
                 Text("Sign Out")
             }
         }
     }
+    if(RefreshButtonClickFlag)
+    {
+        RefreshButtonClickFlag = false
+        mToast(mContext, "Please wait...")
+        refreshed = false
+        showRecommendedFoods = true
+    }
 }
 
+@Composable
+fun RecommendedFoodListRow(items: List<FoodItem>, calorieLimit: Float) {
+    val randomFoods = mutableListOf<FoodItem>()
+    var remainingCalories = calorieLimit
+    val shuffledList = items.shuffled()
+    var beverageCount = 0
+
+    Log.i("recommended list", "pressed")
+
+    for (food in shuffledList) {
+        if (food.calories > 0 && food.calories <= remainingCalories) {
+            if (food.name.contains("beverage", ignoreCase = true)) {
+                if (beverageCount < 1) {
+                    randomFoods.add(food)
+                    beverageCount++
+                    remainingCalories -= food.calories.toFloat()
+                }
+            } else {
+                randomFoods.add(food)
+                remainingCalories -= food.calories.toFloat()
+            }
+        }
+        if (remainingCalories <= 0) {
+            break
+        }
+    }
+
+    var caloriesUsed = calorieLimit - remainingCalories
+
+    Column {
+        randomFoods.forEach { item ->
+            FoodItemRow(item)
+        }
+        Column(
+            modifier = Modifier.fillMaxWidth(),  // This line ensures that the "Total Calories" text is centered within the available width.
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Total Calories: " + caloriesUsed.toString(),
+                fontSize = 15.sp,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+private fun FoodItemRow(item: FoodItem) {
+    Text(
+        text = item.name,
+        fontWeight = FontWeight.Bold
+    )
+    Spacer(modifier = Modifier.height(3.dp))
+    Text(
+        text = "Calories: " + item.calories.toString(),
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+}

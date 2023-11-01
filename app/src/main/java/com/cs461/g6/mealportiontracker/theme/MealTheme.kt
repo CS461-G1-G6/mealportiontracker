@@ -5,10 +5,6 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-class MealTheme {
-}
-
-
 val mealColors = lightColors(
     primary = Color(0xFFFF9C29),
     primaryVariant = Color(0xFFF8694D),
@@ -16,7 +12,7 @@ val mealColors = lightColors(
     secondary = Color(0xFFA1C44D),
     secondaryVariant = Color(0xFFFFD966),
     onSecondary = Color(0xFF000000),
-    background = Color(0xFFFDF4DD),
+    background = Color(0xFFFFFFFF),
     onBackground = Color(0xFF000000),
     surface = Color(0xFFFFDF92),
     onSurface = Color(0xFF000000),

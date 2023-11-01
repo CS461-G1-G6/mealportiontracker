@@ -4,7 +4,10 @@ enum class AppScreen(val title: String) {
     //Bottom Navigation Tabs
     ScreenProfile(title = "Your Profile"),
     ScreenHistory(title = "Your Meal History"),
-    ScreenStats(title = "Your Meal Statistics"),
+    ScreenStats(title = "Your Calories Breakdown"),
     ScreenForums(title = "Forums"),
-    ScreenAddMeal(title = "Log a Meal")
+    ScreenInput(title = "Log a Meal"),
+
+    ScreenSearch(title = "Search Food")
+
 }

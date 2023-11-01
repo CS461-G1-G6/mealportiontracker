@@ -80,7 +80,8 @@ private fun AppNavHost(navController: NavHostController, sessionManager: Session
                 delay(2000) // Show SplashScreen for 2 seconds
                 if (sessionManager.getIsUserLoggedIn()) {
                     navController.navigate(com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name) {
-                        popUpTo(com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name) { inclusive = true }
+                        popUpTo(com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name)
+                        { inclusive = true }
                     }
                 } else {
                     navController.navigate(AppScreen.ScreenLogin.name) {
