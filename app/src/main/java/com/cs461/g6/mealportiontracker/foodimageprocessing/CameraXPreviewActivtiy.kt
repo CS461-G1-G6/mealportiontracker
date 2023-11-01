@@ -178,9 +178,13 @@ fun GallerySelect(
             if (uri != null) {
                 Log.d("SelectedImageUri", uri.toString())
                 onImageUri(uri)
+
+                // After selecting an image, trigger image processing immediately
+                val intent = Intent(context, FoodImageProcessingActivity::class.java)
+                intent.putExtra("imageUri", uri.toString())
+                context.startActivity(intent)
             }
         }
-
     )
 
     @Composable
