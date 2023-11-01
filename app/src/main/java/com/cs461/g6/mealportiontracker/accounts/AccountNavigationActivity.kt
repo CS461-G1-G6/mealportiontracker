@@ -135,8 +135,5 @@ private fun AppNavHost(navController: NavHostController, sessionManager: Session
 
 
         // Add other composables/routes here
-
     }
 }
-
-
