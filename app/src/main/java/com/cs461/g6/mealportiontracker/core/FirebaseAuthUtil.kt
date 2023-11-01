@@ -4,27 +4,25 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.android.gms.tasks.Task
-import com.google.firebase.Timestamp
+import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import java.util.concurrent.CompletableFuture
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 object FirebaseAuthUtil {
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
     data class MealHistory(
-        val user_id: String,
-        val meal_history_id: Int,
-        val food_name: String,
+        val userId: String,
+        val name: String,
         val calories: Double,
-        val protein: Double,
-        val carbohydrates: Double,
-        val fat: Double,
-        val date: Timestamp
+        val proteins: Double,
+        val carbo: Double,
+        val fats: Double,
+        val date: String,
+        val imageUrl: String
     )
 
     fun registerUserWithEmailAndPassword(email: String, password: String): Task<AuthResult> {
@@ -42,58 +40,42 @@ object FirebaseAuthUtil {
     @RequiresApi(Build.VERSION_CODES.N)
     fun addMealHistory(
         userId: String,
-        food: String,
+        name: String,
         calories: Double,
-        protein: Double,
-        carbohydrates: Double,
-        fat: Double,
-        date: Timestamp
-    ): CompletableFuture<Boolean> {
-        val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+        proteins: Double,
+        carbo: Double,
+        fats: Double,
+        date: String,
+        imageUrl: String
+    ): Task<Boolean> {
+        val db: FirebaseDatabase = FirebaseDatabase.getInstance()
 
-        val dbMealHistory: CollectionReference = db.collection("meal_history")
+        val dbReference: DatabaseReference = db.getReference("meal_histories")
 
-        val future = CompletableFuture<Boolean>()
+        val future = TaskCompletionSource<Boolean>()
 
-        dbMealHistory.orderBy("meal_history_id", Query.Direction.DESCENDING)
-            .limit(1)
-            .get()
-            .addOnSuccessListener { documents ->
-                val mealHistoryId: Int = if (!documents.isEmpty()) {
-                    val document = documents.documents[0]
-                    document.getLong("meal_history_id")!!.toInt() + 1
-                } else {
-                    1
-                }
+        // Create a Map to store your meal history data
+        val mealHistoryData = mapOf(
+            "userId" to userId,
+            "name" to name,
+            "calories" to calories,
+            "proteins" to proteins,
+            "carbo" to carbo,
+            "fats" to fats,
+            "date" to date,
+            "imageUrl" to imageUrl
+        )
 
-
-
-                // Create a new MealHistory object
-                val mealHistory = MealHistory(
-                    userId,
-                    mealHistoryId,
-                    food,
-                    calories,
-                    protein,
-                    carbohydrates,
-                    fat,
-                    date
-                )
-
-                dbMealHistory.add(mealHistory)
-                    .addOnSuccessListener {
-                        future.complete(true) // Operation succeeded, set CompletableFuture to true
-                    }
-                    .addOnFailureListener { e ->
-                        future.complete(false) // Operation failed, set CompletableFuture to false
-                    }
+        dbReference.push().setValue(mealHistoryData)
+            .addOnSuccessListener {
+                future.setResult(true) // Operation succeeded, set Task to true
             }
-            .addOnFailureListener { exception ->
-                Log.e("FirestoreQuery", "Error getting documents: $exception")
-                future.complete(false) // Operation failed, set CompletableFuture to false in case of an error
+            .addOnFailureListener { e ->
+                Log.e("RealtimeDatabase", "Error writing document: $e")
+                future.setResult(false) // Operation failed, set Task to false in case of an error
             }
 
-        return future
+        return future.task
     }
 
 

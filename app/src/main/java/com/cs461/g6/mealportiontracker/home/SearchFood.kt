@@ -61,7 +61,6 @@ import androidx.navigation.compose.rememberNavController
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.home.ui.theme.SearchBarComposeTheme
 import com.cs461.g6.mealportiontracker.utils.SessionManager
-import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.BufferedReader
@@ -144,40 +143,23 @@ fun ScreenSearchFood(navController: NavHostController, viewModel: MainViewModel,
                     FoodItemRow(foodItem = foodItem, onAddButtonClick = {
                         // Handle adding the food item into the database here
 
-                        //Need to ask
                         val userId = sessionManager.getUserId()!!
 
                         val protein = foodItem.proteins.replace("[^\\d.]".toRegex(), "").toDoubleOrNull() ?: 0.0
-
                         val carbs = foodItem.carbs.replace("[^\\d.]".toRegex(), "").toDoubleOrNull() ?: 0.0
-
                         val fat = foodItem.fats.replace("[^\\d.]".toRegex(), "").toDoubleOrNull() ?: 0.0
 
                         val currentTimeMillis = System.currentTimeMillis()
-                        val sdf = SimpleDateFormat("d MMMM yyyy 'at' HH:mm:ss 'UTC'Z", Locale.getDefault())
-                        val timeZone = TimeZone.getTimeZone("GMT+8") // Set your desired time zone
-                        sdf.timeZone = timeZone
-
+                        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) // Change date format here
                         val formattedDate = sdf.format(currentTimeMillis)
 
-                        val date: Date = sdf.parse(formattedDate) // Parse the formatted date string to Date object
-                        val timestamp: Timestamp = Timestamp(date) // Convert Date object to Timestamp object
-
-                        FirebaseAuthUtil.addMealHistory(userId, foodItem.name, foodItem.calories, protein, carbs, fat, timestamp)
-                            .thenAccept { success ->
-                                if (success) {
-                                    Toast.makeText(
-                                        context,
-                                        "The food has been successfully added",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "The food could not be added. Please try again later.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                        FirebaseAuthUtil.addMealHistory(userId, foodItem.name, foodItem.calories, protein, carbs, fat, formattedDate, "")
+                            .addOnSuccessListener {
+                                Toast.makeText(context, "The food has been successfully added", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(context, "The food could not be added. Please try again later.", Toast.LENGTH_SHORT).show()
+                                Log.e("RealtimeDatabase", "Error adding meal history: $e")
                             }
 
                     })

@@ -125,6 +125,7 @@ dependencies {
     implementation("com.google.zxing:zxing-parent:3.5.2")
     implementation ("com.google.zxing:core:3.5.2")
 
+
 }
 
 tasks.register("prepareKotlinBuildScriptModel"){}
