@@ -53,18 +53,18 @@ val myGreenColor = Color(0xFF228B22)
 val myBlueColor = Color(0xFF3498DB)
 
 data class StatisticsData(
-    val totalCalories: Int,
-    val totalFats: Int,
-    val totalProteins: Int,
-    val totalCarbo: Int
+    val totalCalories: Float,
+    val totalFats: Float,
+    val totalProteins: Float,
+    val totalCarbo: Float
 )
 
 data class FoodInfoWithDate(
     val name: String = "",
-    val calories: Int = 0,
-    val proteins: Int = 0,
-    val carbo: Int = 0,
-    val fats: Int = 0,
+    val calories: Float = 0.0f,
+    val proteins: Float = 0.0f,
+    val carbo: Float = 0.0f,
+    val fats: Float = 0.0f,
     val date: String = "",
     val imageUrl: String = "",
     val userId: String = ""
@@ -90,10 +90,11 @@ class Statistics : ComponentActivity() {
 
 @Composable
 fun ScreenStats(sessionManager: SessionManager, navController: NavHostController) {
-    var totalCalories by remember { mutableStateOf(0) }
-    var totalFats by remember { mutableStateOf(0) }
-    var totalProteins by remember { mutableStateOf(0) }
-    var totalCarbo by remember { mutableStateOf(0) }
+    var totalCalories by remember { mutableStateOf(0.0f) }
+    var totalFats by remember { mutableStateOf(0.0f) }
+    var totalProteins by remember { mutableStateOf(0.0f) }
+    var totalCarbo by remember { mutableStateOf(0.0f) }
+
     var recommendedCalories by remember { mutableStateOf(0) }
 
     val currentUser = FirebaseAuthUtil.getCurrentUser()
@@ -268,10 +269,10 @@ fun DateFilterButtons(
 
 @Composable
 fun MealStatsContent(
-    totalCalories: Int,
-    totalFats: Int,
-    totalProteins: Int,
-    totalCarbo: Int,
+    totalCalories: Float,
+    totalFats: Float,
+    totalProteins: Float,
+    totalCarbo: Float,
     recommendedCalories: Int,
     fatPercentage: Float,
     proteinPercentage: Float,
@@ -299,7 +300,7 @@ fun MealStatsContent(
 
         Spacer(modifier = Modifier.height(25.dp))
 
-        val pieChartSizePercentage = 0.4f  // Adjust this value as needed
+        val pieChartSizePercentage = 0.5f  // Adjust this value as needed
 
         // Calculate the PieChart size based on the screen width
         val screenWidth = configuration.screenWidthDp
@@ -439,10 +440,10 @@ private fun isDateInRange(date: String, startDate: String, endDate: String): Boo
 
 
 private fun calculateTotalStatistics(mealHistories: List<FoodInfoWithDate>): StatisticsData {
-    var totalCalories = 0
-    var totalFats = 0
-    var totalProteins = 0
-    var totalCarbo = 0
+    var totalCalories = 0.0f
+    var totalFats = 0.0f
+    var totalProteins = 0.0f
+    var totalCarbo = 0.0f
 
     for (meal in mealHistories) {
         totalCalories += meal.calories
