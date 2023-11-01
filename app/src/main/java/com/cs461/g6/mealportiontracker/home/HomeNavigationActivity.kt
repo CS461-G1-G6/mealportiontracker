@@ -306,7 +306,7 @@ private fun AppNavHost(
         }
 
         composable(route = AppScreen.ScreenStats.name) {
-            ScreenStats()
+            ScreenStats(sessionManager, navController)
         }
 
         composable(route = AppScreen.ScreenSearch.name) {
