@@ -264,7 +264,7 @@ private fun AppNavHost(
 
 
         composable(route = AppScreen.ScreenHistory.name) {
-            ScreenHistory()
+            ScreenHistory(sessionManager, navController)
         }
 
         composable(route = AppScreen.ScreenStats.name) {
@@ -273,7 +273,7 @@ private fun AppNavHost(
 
         composable(route = AppScreen.ScreenForums.name) {
 //            ScreenForums(sessionManager, navController)
-            ScreenForums()
+            ScreenForums(sessionManager, navController)
 
         }
 
