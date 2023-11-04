@@ -286,7 +286,6 @@ private fun AppNavHost(
             ScreenManualInput(navController, inputViewModel,  context = LocalContext.current)
         }
 
-
     }
 }
 
