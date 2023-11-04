@@ -1,12 +1,12 @@
 package com.cs461.g6.mealportiontracker.home
 
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -22,11 +22,8 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
@@ -41,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.cs461.g6.mealportiontracker.theme.mealColors
 import java.util.Calendar
 import kotlin.math.cos
@@ -51,18 +49,18 @@ val myGreenColor = Color(0xFF5BA55B)
 val myBlueColor = Color(0xFF61ABDD)
 
 data class StatisticsData(
-    val totalCalories: Int,
-    val totalFats: Int,
-    val totalProteins: Int,
-    val totalCarbo: Int
+    val totalCalories: Float,
+    val totalFats: Float,
+    val totalProteins: Float,
+    val totalCarbo: Float
 )
 
 data class FoodInfoWithDate(
     val name: String = "",
-    val calories: Int = 0,
-    val proteins: Int = 0,
-    val carbo: Int = 0,
-    val fats: Int = 0,
+    val calories: Float = 0.0f,
+    val proteins: Float = 0.0f,
+    val carbo: Float = 0.0f,
+    val fats: Float = 0.0f,
     val date: String = "",
     val imageUrl: String = "",
     val userId: String = ""
@@ -74,24 +72,27 @@ class Statistics : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Set up any necessary NavHostController and SessionManager here if needed
-
         setContent {
-            // You can pass your NavHostController and SessionManager to ScreenStats
-            val navController: NavHostController = remember { NavHostController(this) }
-            val sessionManager: SessionManager = remember { SessionManager(this) }
+                // You can pass your NavHostController and SessionManager to ScreenStats
+                val navController: NavHostController = remember { NavHostController(this) }
+                val sessionManager: SessionManager = remember { SessionManager(this) }
 
-            // Display the ScreenStats composable within the ComposeView
-            ScreenStats(navController)
+            MealTheme {
+                // Display the ScreenStats composable within the ComposeView
+                ScreenStats(sessionManager, navController)
+            }
+
         }
     }
 }
 
 @Composable
-fun ScreenStats(navController: NavHostController) {
-    var totalCalories by remember { mutableStateOf(0) }
-    var totalFats by remember { mutableStateOf(0) }
-    var totalProteins by remember { mutableStateOf(0) }
-    var totalCarbo by remember { mutableStateOf(0) }
+fun ScreenStats(sessionManager: SessionManager, navController: NavHostController) {
+    var totalCalories by remember { mutableStateOf(0.0f) }
+    var totalFats by remember { mutableStateOf(0.0f) }
+    var totalProteins by remember { mutableStateOf(0.0f) }
+    var totalCarbo by remember { mutableStateOf(0.0f) }
+
     var recommendedCalories by remember { mutableStateOf(0) }
 
     val currentUser = FirebaseAuthUtil.getCurrentUser()
@@ -119,14 +120,6 @@ fun ScreenStats(navController: NavHostController) {
 
         return Pair(startOfWeekDate, endOfWeekDate)
     }
-
-
-//    val dateLabel = if (selectedFilter == "Today") {
-//        "Today"
-//    } else {
-//        val (startOfWeekDate, endOfWeekDate) = calculateDateRangeForWeek()
-//        "$startOfWeekDate - $endOfWeekDate"
-//    }
 
 
     if (currentUser != null) {
@@ -193,13 +186,15 @@ fun ScreenStats(navController: NavHostController) {
             }
         )
 
+
         Spacer(modifier = Modifier.height(5.dp))
 
+
         if (totalCalories > 0 || totalFats > 0 || totalProteins > 0 || totalCarbo > 0) {
-            val total = totalFats.toFloat() + totalProteins.toFloat() + totalCarbo.toFloat()
-            val fatPercentage = (totalFats.toFloat() / total) * 100
-            val proteinPercentage = (totalProteins.toFloat() / total) * 100
-            val carboPercentage = (totalCarbo.toFloat() / total) * 100
+            val total = totalFats + totalProteins + totalCarbo
+            val fatPercentage = (totalFats / total) * 100
+            val proteinPercentage = (totalProteins / total) * 100
+            val carboPercentage = (totalCarbo / total) * 100
 
             // Put your MealStatsContent inside the Column
             MealStatsContent(
@@ -215,7 +210,7 @@ fun ScreenStats(navController: NavHostController) {
 
         } else {
             // Put your NoRecordsFoundContent inside the Column
-            NoRecordsFoundContent()
+            NoRecordsFoundContent(context)
         }
 
 //        Spacer(modifier = Modifier.height(25.dp))
@@ -253,10 +248,10 @@ fun DateFilterTabs(todaySelected: Boolean, onTodayClicked: () -> Unit, onThisWee
 
 @Composable
 fun MealStatsContent(
-    totalCalories: Int,
-    totalFats: Int,
-    totalProteins: Int,
-    totalCarbo: Int,
+    totalCalories: Float,
+    totalFats: Float,
+    totalProteins: Float,
+    totalCarbo: Float,
     recommendedCalories: Int,
     fatPercentage: Float,
     proteinPercentage: Float,
@@ -284,7 +279,7 @@ fun MealStatsContent(
 
         Spacer(modifier = Modifier.height(25.dp))
 
-        val pieChartSizePercentage = 0.4f  // Adjust this value as needed
+        val pieChartSizePercentage = 0.5f  // Adjust this value as needed
 
         // Calculate the PieChart size based on the screen width
         val screenWidth = configuration.screenWidthDp
@@ -359,7 +354,7 @@ fun MealStatsContent(
 
 
 @Composable
-fun NoRecordsFoundContent() {
+fun NoRecordsFoundContent(context: Context) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -424,10 +419,10 @@ private fun isDateInRange(date: String, startDate: String, endDate: String): Boo
 
 
 private fun calculateTotalStatistics(mealHistories: List<FoodInfoWithDate>): StatisticsData {
-    var totalCalories = 0
-    var totalFats = 0
-    var totalProteins = 0
-    var totalCarbo = 0
+    var totalCalories = 0.0f
+    var totalFats = 0.0f
+    var totalProteins = 0.0f
+    var totalCarbo = 0.0f
 
     for (meal in mealHistories) {
         totalCalories += meal.calories
@@ -492,7 +487,7 @@ private fun DrawScope.drawPercentageLabel(centerX: Float, centerY: Float, radius
     val fontSize = 35f
     val paint = Paint().apply {
         color = Color.Black.toArgb()
-        textAlign = Paint.Align.CENTER
+        textAlign = android.graphics.Paint.Align.CENTER
         textSize = fontSize
     }
     drawIntoCanvas {
@@ -551,6 +546,7 @@ fun PieChartLegendItem(color: Color, label: String) {
         Text(text = label, style = TextStyle(fontWeight = FontWeight.Bold))
     }
 }
+
 
 
 

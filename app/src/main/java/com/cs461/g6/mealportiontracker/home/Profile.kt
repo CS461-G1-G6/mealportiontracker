@@ -243,27 +243,27 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
             )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
-                value = if (weight > 0) weight.toString() + " kg" else "",
+                value = if (weight > 0) "$weight kg" else "",
                 onValueChange = { newWeightText ->
                     val newWeight = newWeightText.removeSuffix(" kg").toFloatOrNull()
                     if (newWeight != null) {
                         weight = newWeight
                     }
                 },
-                label = { Text("Current Weight: " + (if (weight != null && weight > 0) weight.toString() else "") + " kg") },
-                placeholder = { Text(if (weight != null && weight > 0) weight.toString() + " kg" else "Enter Weight in cm") }
+                label = { Text("Current Weight: " + (if (weight > 0) weight.toString() else "") + " kg") },
+                placeholder = { Text(if (weight > 0) "$weight kg" else "Enter Weight in cm") }
             )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
-                value = if (height > 0) height.toString() + " cm" else "",
+                value = if (height > 0) "$height cm" else "",
                 onValueChange = { newHeightText ->
                     val newHeight = newHeightText.removeSuffix(" cm").toFloatOrNull()
                     if (newHeight != null) {
                         height = newHeight
                     }
                 },
-                label = { Text("Current Height: " + (if (height != null && height > 0) height.toString() else "") + " cm") },
-                placeholder = { Text(if (height != null && height > 0) height.toString() + " cm" else "Enter Height in cm") }
+                label = { Text("Current Height: " + (if (height > 0) height.toString() else "") + " cm") },
+                placeholder = { Text(if (height > 0) "$height cm" else "Enter Height in cm") }
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(text="How Active are you:", fontSize = 18.sp)
@@ -308,7 +308,7 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                         updateData
                     ) { databaseError, databaseReference ->
                         if (databaseError != null) {
-                            mToast(mContext, "An error has occured while updating information")
+                            mToast(mContext, "An error has occurred while updating information")
                         } else {
                             recommendedCalories = recommendedCaloriesDb
                             mToast(mContext, "Successfully Updated Information")
@@ -320,7 +320,7 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                 Text("Update Information")
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Recommended Calories: " + recommendedCalories.toString(), fontSize = 18.sp, textAlign = TextAlign.Center)
+            Text(text = "Recommended Calories: $recommendedCalories", fontSize = 18.sp, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Recommended Food", fontSize = 18.sp, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(8.dp))
@@ -407,7 +407,7 @@ fun RecommendedFoodListRow(items: List<FoodItem>, calorieLimit: Float) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Total Calories: " + caloriesUsed.toString(),
+                text = "Total Calories: $caloriesUsed",
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center
             )

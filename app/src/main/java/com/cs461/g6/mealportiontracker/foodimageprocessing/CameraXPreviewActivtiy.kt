@@ -137,6 +137,7 @@ fun App(modifier: Modifier = Modifier) {
     }
 }
 
+
 @ExperimentalPermissionsApi
 @Composable
 fun GallerySelect(
@@ -147,12 +148,21 @@ fun GallerySelect(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            onImageUri(uri ?: EMPTY_IMAGE_URI)
+            if (uri != null) {
+                Log.d("SelectedImageUri", uri.toString())
+                onImageUri(uri)
+
+                // After selecting an image, trigger image processing immediately
+                val intent = Intent(context, FoodImageProcessingActivity::class.java)
+                intent.putExtra("imageUri", uri.toString())
+                context.startActivity(intent)
+            }
         }
     )
 
     @Composable
     fun LaunchGallery() {
+        Log.d("Gallery Select", "Gallery Selected")
         SideEffect {
             launcher.launch("image/*")
         }

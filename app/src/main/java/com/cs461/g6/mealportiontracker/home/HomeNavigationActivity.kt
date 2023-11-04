@@ -262,16 +262,13 @@ private fun AppNavHost(
             ScreenProfile(sessionManager, navController)
         }
 
-        composable(route = AppScreen.ScreenStats.name) {
-            ScreenStats(navController)
-        }
 
         composable(route = AppScreen.ScreenHistory.name) {
             ScreenHistory()
         }
 
         composable(route = AppScreen.ScreenStats.name) {
-            ScreenStats(navController)
+            ScreenStats(sessionManager,navController)
         }
 
         composable(route = AppScreen.ScreenForums.name) {
