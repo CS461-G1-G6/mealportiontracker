@@ -76,7 +76,7 @@ fun LazyListScope.displayImagesComponent() {
     // for a single element in the list
     item {
         TitleComponent("Load image from the resource folder")
-        LocalResourceImageComponent(R.drawable.landscape)
+        LocalResourceImageComponent(R.drawable.logo_plate)
     }
 
     item {
@@ -95,7 +95,7 @@ fun LazyListScope.displayImagesComponent() {
 
     item {
         TitleComponent("Image with rounded corners")
-        ImageWithRoundedCorners(R.drawable.landscape)
+        ImageWithRoundedCorners(R.drawable.logo_plate)
     }
 }
 
@@ -360,7 +360,7 @@ fun Modifier.RoundedCornerClipModifier(size: Dp): Modifier = composed {
 @Composable
 fun LocalResourceImageComponentPreview() {
     Column {
-        LocalResourceImageComponent(R.drawable.landscape)
+        LocalResourceImageComponent(R.drawable.logo_plate)
     }
 }
 
@@ -379,5 +379,5 @@ fun NetworkImageComponentGlidePreview() {
 @Preview("Add round corners to an image")
 @Composable
 fun ImageWithRoundedCornersPreview() {
-    ImageWithRoundedCorners(R.drawable.landscape)
+    ImageWithRoundedCorners(R.drawable.logo_plate)
 }

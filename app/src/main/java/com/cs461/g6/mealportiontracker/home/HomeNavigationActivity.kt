@@ -3,6 +3,7 @@ package com.cs461.g6.mealportiontracker.home
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -264,7 +265,8 @@ private fun AppNavHost(
 
 
         composable(route = AppScreen.ScreenHistory.name) {
-            ScreenHistory(sessionManager, navController)
+            ScreenHistory()
+            Log.i("------------------", "Clicked ScreenHistory")
         }
 
         composable(route = AppScreen.ScreenStats.name) {

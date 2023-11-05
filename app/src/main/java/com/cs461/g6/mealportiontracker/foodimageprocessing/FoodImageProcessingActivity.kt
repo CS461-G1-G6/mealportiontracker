@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.FirebaseApp
 import android.net.Uri
+import coil.compose.rememberAsyncImagePainter
 import com.bumptech.glide.request.transition.Transition
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.google.gson.Gson
@@ -95,7 +96,7 @@ fun App(imageUri: String) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = rememberImagePainter(data = imageUri),
+                    painter = rememberAsyncImagePainter(model = imageUri),
                     contentDescription = null, // Set a meaningful content description
                     modifier = Modifier.fillMaxWidth().height(200.dp)
                 )
@@ -349,7 +350,7 @@ private fun addFoodInfoToFirebase(context: Context, foodInfo: FoodInfo, imageUri
                     if (downloadUri != null) {
                         // Now, create a FoodInfoWithDate object with the image URL
                         val foodInfoWithDate = FoodInfoWithDate(
-                            name = foodInfo.name,
+                            name = foodInfo.name.toTitleCase(),
                             calories = foodInfo.calories,
                             proteins = foodInfo.proteins,
                             carbo = foodInfo.carbo,
@@ -388,7 +389,11 @@ private fun addFoodInfoToFirebase(context: Context, foodInfo: FoodInfo, imageUri
     }
 }
 
-
+fun String.toTitleCase(): String {
+    return split(" ").joinToString(" ") { word ->
+        word.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+    }
+}
 
 
 fun mToast(context: Context, message: String) {

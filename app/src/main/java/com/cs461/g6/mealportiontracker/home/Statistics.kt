@@ -487,7 +487,7 @@ private fun DrawScope.drawPercentageLabel(centerX: Float, centerY: Float, radius
     val fontSize = 35f
     val paint = Paint().apply {
         color = Color.Black.toArgb()
-        textAlign = android.graphics.Paint.Align.CENTER
+        textAlign = Paint.Align.CENTER
         textSize = fontSize
     }
     drawIntoCanvas {

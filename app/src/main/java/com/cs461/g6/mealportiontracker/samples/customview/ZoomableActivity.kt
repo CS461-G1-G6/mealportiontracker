@@ -82,7 +82,7 @@ fun ZoomableComposable() {
         // There are multiple methods available to load an image resource in Compose. 
         // However, it would be advisable to use the painterResource method as it loads
         // an image resource asynchronously
-        val imagepainter = painterResource(id = R.drawable.landscape)
+        val imagepainter = painterResource(id = R.drawable.logo_plate)
         // Image is a pre-defined composable that lays out and draws a given [ImageBitmap].
         // We use the graphicsLayer modifier to modify the scale & translation of the image.
         // This is read from the state properties that we created above.

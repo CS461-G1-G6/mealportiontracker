@@ -19,6 +19,7 @@ import com.cs461.g6.mealportiontracker.home.ScreenProfile
 import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.cs461.g6.mealportiontracker.core.SessionManager
 import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
+import com.cs461.g6.mealportiontracker.home.ScreenHistory
 
 class AccountNavigationActivity : ComponentActivity() {
 
@@ -100,6 +101,10 @@ private fun AppNavHost(navController: NavHostController, sessionManager: Session
 
         composable(route = com.cs461.g6.mealportiontracker.home.AppScreen.ScreenProfile.name) {
             ScreenProfile(sessionManager, navController)
+        }
+
+        composable(route = com.cs461.g6.mealportiontracker.home.AppScreen.ScreenHistory.name) {
+            ScreenHistory()
         }
 
         // Add other composables/routes here

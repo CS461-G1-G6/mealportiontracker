@@ -3,7 +3,9 @@ package com.cs461.g6.mealportiontracker.theme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 val mealColors = lightColors(
     primary = Color(0xFFFF9C29),
@@ -19,9 +21,24 @@ val mealColors = lightColors(
     error = Color(0xFFB00020)
 )
 
-
+//@Composable
+//fun MealTheme(children: @Composable () -> Unit) {
+//    MaterialTheme(colors = mealColors, content = children)
+//}
 
 @Composable
-fun MealTheme(children: @Composable () -> Unit) {
-    MaterialTheme(colors = mealColors, content = children)
+fun MealTheme(content: @Composable () -> Unit) {
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
+
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = mealColors.primary,
+            darkIcons = useDarkIcons
+        )
+    }
+
+    MaterialTheme(colors = mealColors) {
+        content()
+    }
 }

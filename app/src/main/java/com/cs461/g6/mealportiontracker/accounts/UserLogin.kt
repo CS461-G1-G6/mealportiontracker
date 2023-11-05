@@ -3,6 +3,7 @@ package com.cs461.g6.mealportiontracker.accounts
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import com.google.firebase.auth.*
@@ -11,10 +12,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.cs461.g6.mealportiontracker.R
 import com.google.firebase.database.FirebaseDatabase
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.home.AppScreen
@@ -41,7 +46,12 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-    ) {
+    )
+    {
+        Image(
+            painter = painterResource(id = R.drawable.logo_medium),
+            contentDescription = "App Logo"
+        )
         OutlinedTextField(
             value = email,
             onValueChange = { newEmail -> email = newEmail },

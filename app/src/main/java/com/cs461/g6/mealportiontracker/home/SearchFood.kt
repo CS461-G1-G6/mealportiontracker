@@ -1,6 +1,5 @@
 package com.cs461.g6.mealportiontracker.home
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_APPEND

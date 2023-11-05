@@ -120,6 +120,9 @@ dependencies {
 
     implementation("com.google.zxing:zxing-parent:3.5.2")
     implementation ("com.google.zxing:core:3.3.0")
+
+    implementation ("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
+
 }
 
 tasks.register("prepareKotlinBuildScriptModel"){}

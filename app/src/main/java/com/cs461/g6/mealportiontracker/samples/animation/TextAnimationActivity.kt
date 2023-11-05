@@ -129,7 +129,7 @@ fun TextAnimationComponent() {
 fun ComposeLogoComponent() {
     // There are multiple methods available to load an image resource in Compose. However, it would
     // be advisable to use the painterResource method as it loads an image resource asynchronously
-    val image = ImageBitmap.imageResource(R.drawable.compose_logo)
+    val image = ImageBitmap.imageResource(R.drawable.ic_piechart)
 
     // rememberInfiniteTransition is used to create a transition that uses infitine
     // child animations. Animations typically get invoked as soon as they enter the

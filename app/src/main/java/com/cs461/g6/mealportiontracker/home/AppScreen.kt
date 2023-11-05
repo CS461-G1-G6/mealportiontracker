@@ -7,7 +7,6 @@ enum class AppScreen(val title: String) {
     ScreenStats(title = "Your Calories Breakdown"),
     ScreenForums(title = "Forums"),
     ScreenInput(title = "Log a Meal"),
-
     ScreenSearch(title = "Search Food")
 
 }

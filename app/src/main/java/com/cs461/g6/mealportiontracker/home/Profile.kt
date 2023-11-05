@@ -103,7 +103,7 @@ private fun fetchUserProfile(sessionManager: SessionManager, callback: (User?) -
 }
 
 @Composable
-fun activityRadioButton(
+fun ActivityRadioButton(
     options: List<Pair<Double, String>>,
     selectedActivity: Double,
     onOptionSelected: (Double) -> Unit
@@ -164,7 +164,7 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                 isLoading = false
             } else {
                 isLoading = false
-                mToast(mContext, "Error retrieving profile information from database")
+                mToast(mContext, "Error retrieving profile information from database.")
             }
         }
     }
@@ -267,7 +267,7 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(text="How Active are you:", fontSize = 18.sp)
-            activityRadioButton(
+            ActivityRadioButton(
                 options = activityOptions,
                 selectedActivity = selectedActivity
             ) { selectedOption ->
@@ -289,7 +289,7 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                     mToast(mContext, "Please enter valid age")
                     haveError = true
                 }
-                var recommendedCaloriesDb:Float = 0.0f
+                var recommendedCaloriesDb = 0.0f
                 if (selectedOption == "M") {
                     recommendedCaloriesDb = (((13.397*weight) + (4.799*height) - (5.677*age.toFloat()) + 88.362)* selectedActivity.toFloat()).toFloat()
                 } else {
