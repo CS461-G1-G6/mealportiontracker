@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,8 +25,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +39,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.core.SessionManager
+import com.cs461.g6.mealportiontracker.theme.mealColorsAlt
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.BufferedReader
@@ -84,8 +90,13 @@ fun ScreenSearchFood(
         viewModel.refreshData()
     }
 
-    Scaffold(
-        topBar = {
+    Scaffold { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(start = 16.dp, end = 16.dp)
+        ) {
+
             SearchBar(
                 query = query,
                 onQueryChange = {
@@ -101,13 +112,7 @@ fun ScreenSearchFood(
                     navController.navigate(AppScreen.ScreenInput.name)
                 }
             )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(start = 16.dp, end = 16.dp)
-        ) {
+
             // LazyColumn with filtered items
             LazyColumn(
                 modifier = Modifier
@@ -168,6 +173,7 @@ fun ScreenSearchFood(
     }
 }
 
+
 @Composable
 fun SearchBar(
     query: String,
@@ -176,18 +182,15 @@ fun SearchBar(
     onAddClick: () -> Unit
 ) {
     var searchText by remember { mutableStateOf(query) }
-    val bgColor: Color = Color(244, 240, 236)
-    val iconColor: Color = Color(169, 169, 169)
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(vertical = 16.dp, horizontal = 5.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
+                .heightIn(max = 55.dp)
         ) {
             TextField(
                 value = searchText,
@@ -195,12 +198,12 @@ fun SearchBar(
                     searchText = it
                     onQueryChange(it)
                 },
-                placeholder = { Text("Search food...") },
+                placeholder = { Text("Search...") },
                 modifier = Modifier
                     .weight(1f) // Take up remaining space
                     .padding(end = 8.dp), // Add padding to the end
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = bgColor,
+                    backgroundColor = mealColorsAlt.onPrimary,
                     disabledLabelColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
@@ -211,7 +214,7 @@ fun SearchBar(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
-                        tint = iconColor
+                        tint = Color.Gray
                     )
                 },
                 trailingIcon = {
@@ -223,7 +226,7 @@ fun SearchBar(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = null,
-                                tint = iconColor
+                                tint = Color.Gray
                             )
                         }
                     }
@@ -232,12 +235,17 @@ fun SearchBar(
             // Add button next to the search bar
             Button(
                 onClick = { onAddClick() }, // Call the provided onAddClick lambda when the button is clicked
-                modifier = Modifier.padding(
-                    start = 8.dp,
-                    top = 3.dp
-                ) // Add padding to the start of the button
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(start = 8.dp)
             ) {
-                Text("Add")
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "New Meal",
+                )
+                Text("New",
+                fontSize = 15.sp)
             }
         }
     }
@@ -287,7 +295,7 @@ fun FoodItemRow(foodItem: FoodItem, onAddButtonClick: () -> Unit) {
                     contentDescription = null,
                     tint = addColor,
                     modifier = Modifier
-                        .size(48.dp) // Set size
+                        .size(40.dp) // Set size
                         .background(circleColor, CircleShape) // Set background color and shape
                         .padding(8.dp) // Set padding
                         .clip(CircleShape) // Clip the icon to a circle shape

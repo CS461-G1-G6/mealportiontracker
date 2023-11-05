@@ -37,6 +37,8 @@ object FirebaseAuthUtil {
         return auth.currentUser
     }
 
+
+
     @RequiresApi(Build.VERSION_CODES.N)
     fun addMealHistory(
         userId: String,

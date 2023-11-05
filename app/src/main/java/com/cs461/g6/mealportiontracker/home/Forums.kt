@@ -5,22 +5,25 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,15 +34,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
+import com.cs461.g6.mealportiontracker.R
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.core.SessionManager
 import com.cs461.g6.mealportiontracker.theme.MealTheme
+import com.cs461.g6.mealportiontracker.theme.mealColors
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -110,41 +115,25 @@ fun ScreenForums(navController: NavHostController,
         }
     }
     if (!loading.value) {
-        Scaffold(
-            topBar = {
-                SearchPostBar(
-                    query = query,
-                    onQueryChange = {
-                        query = it
-                        viewModel.onSearchTextChange(it)
-                    },
-                    onSearch = {
-                        viewModel.onSearchTextChange(query)
-                    },
+        Scaffold { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(start = 16.dp, end = 16.dp)
+            ) {
+                CreatePost(
                     onAddClick = {
                         //val intent = Intent(context, ManualInputActivity::class.java)
                         //context.startActivity(intent)
                         navController.navigate(AppScreen.ScreenAddPost.name)
                     }
                 )
-            }
-        ) { innerPadding ->
-            Column(
-                //            verticalArrangement = Arrangement.Center,
-                //            horizontalAlignment = Alignment.CenterHorizontally,
-                //            modifier = Modifier
-                //                .fillMaxSize()
-                //                .padding(16.dp)
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(start = 16.dp, end = 16.dp)
-            ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
-                    items(postList) { post ->
+                    items(postList.reversed()) { post ->
                         PostEntryCard(post)
                     }
                 }
@@ -154,63 +143,112 @@ fun ScreenForums(navController: NavHostController,
 }
 
 @Composable
-fun SearchPostBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    onSearch: () -> Unit,
+fun CreatePost(
     onAddClick: () -> Unit
 ) {
-    var searchText by remember { mutableStateOf(query) }
-    val bgColor: Color = Color(244, 240, 236)
-    val iconColor: Color = Color(169, 169, 169)
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 4.dp),
+                .padding(top = 20.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
             Button(
-                onClick = { onAddClick() }, // Call the provided onAddClick lambda when the button is clicked
-                modifier = Modifier.padding(
-                    start = 8.dp,
-                    top = 3.dp
-                ) // Add padding to the start of the button
+                onClick = { onAddClick()
+                          }, // Call the provided onAddClick lambda when the button is clicked
             ) {
-                Text("Create Post")
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Back"
+                )
+                Text(" Create a Post")
             }
         }
-    }
 }
 
 @Composable
 fun PostEntryCard(post: Post) {
+    val isExpanded = remember { mutableStateOf(false) }
+    val shortTextLimit = 70
+
+    val bodyText = if (isExpanded.value || post.body.length <= shortTextLimit) post.body else post.body.take(shortTextLimit)
+
     Card(
         modifier = Modifier
-            .padding(vertical = 8.dp)
+            .padding(vertical = 10.dp)
             .fillMaxWidth(),
-//        shape = RoundedCornerShape(15.dp),
+        backgroundColor = mealColors.background,
+        shape = RoundedCornerShape(10.dp),
         elevation = 10.dp
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Spacer(Modifier.width(16.dp))
+        Column {
+            Spacer(Modifier.height(15.dp))
 
-            Column {
+            Row(Modifier.padding(horizontal = 15.dp)) {
+                Column {
+                    val currentUser = FirebaseAuthUtil.getCurrentUser()
+                    if (post.userId == currentUser.toString()){
+                        Icon(
+                            imageVector = Icons.Filled.AccountCircle,
+                            contentDescription = "Read More / Less",
+                            tint = mealColors.secondary
+                        )
+                    }
+
+                    Text(
+                        text = post.title,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+
+                    Text(
+                        text = bodyText,
+                        fontSize = 14.sp
+                    )
+
+                    if(post.body.length > shortTextLimit) {
+                        TextButton(
+                            onClick = { isExpanded.value = !isExpanded.value },
+                            modifier = Modifier
+                                .padding(top = 8.dp)
+                                .defaultMinSize(minHeight = 16.dp),
+                        ) {
+                            Text(
+                                text = if (isExpanded.value) "Read Less" else "Read More",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.W800,
+                                color = mealColors.secondary
+                            )
+                            Icon(
+                                imageVector =
+                                if (isExpanded.value) Icons.Filled.KeyboardArrowUp
+                                else Icons.Filled.KeyboardArrowRight,
+                                contentDescription = "Read More / Less",
+                                tint = mealColors.secondary
+                            )
+
+                        }
+                    }
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ){
                 Text(
-                    text = post.title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-                Text(text = "Posted on: ${post.postDate}", modifier = Modifier.padding(vertical = 2.dp))
-                Text(text = post.body)
+                    textAlign = TextAlign.Right,
+                    text = "Posted on: ${post.postDate}",
+                    color = Color.Gray,
+                    fontSize = 12.sp)
             }
         }
     }
 }
+
+
+
+
+
+

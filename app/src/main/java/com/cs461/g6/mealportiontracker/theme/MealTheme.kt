@@ -18,8 +18,23 @@ val mealColors = lightColors(
     onBackground = Color(0xFF000000),
     surface = Color(0xFFFFDF92),
     onSurface = Color(0xFF000000),
-    error = Color(0xFFB00020)
+    error = Color(0xFFB00020),
 )
+
+val mealColorsAlt = lightColors(
+    primary = Color(0xFFFF9C29),
+    primaryVariant = Color(0xFFF8694D),
+    onPrimary = Color(0xFFF4F0EC), //for searchbar bg
+    secondary = Color(0xFFA1C44D),
+    secondaryVariant = Color(0xFFFFD966),
+    onSecondary = Color(0xFF000000),
+    background = Color(0xFFFFFFFF),
+    onBackground = Color(0xFF000000),
+    surface = Color(0xFFFFDF92),
+    onSurface = Color(0xFF000000),
+    error = Color(0xFFB00020),
+)
+
 
 //@Composable
 //fun MealTheme(children: @Composable () -> Unit) {

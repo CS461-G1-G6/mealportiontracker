@@ -2,7 +2,6 @@ package com.cs461.g6.mealportiontracker.home
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -11,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
@@ -167,7 +165,7 @@ fun MealEntryCard(meal: MealEntry) {
             .padding(vertical = 8.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(15.dp),
-        elevation = 10.dp,
+        elevation = 5.dp,
         backgroundColor = mealColors.background
     ) {
         Row(
