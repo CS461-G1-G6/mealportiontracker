@@ -150,7 +150,7 @@ fun MyBottomNavBar(
     navController: NavHostController
 ) {
     val listItems = listOf("Profile", "History", "Stats", "Forums", "Search")
-    var selectedIndex by remember { mutableStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(0) }
 
     BottomNavigation {
         listItems.forEachIndexed { index, label ->
@@ -274,9 +274,11 @@ private fun AppNavHost(
         }
 
         composable(route = AppScreen.ScreenForums.name) {
-//            ScreenForums(sessionManager, navController)
-            ScreenForums(sessionManager, navController)
+            ScreenForums(navController, viewModel = viewModel, sessionManager)
+        }
 
+        composable(route = AppScreen.ScreenAddPost.name) {
+            ScreenAddPost(sessionManager, navController, context = LocalContext.current)
         }
 
         composable(route = AppScreen.ScreenSearch.name) {
@@ -290,6 +292,7 @@ private fun AppNavHost(
 
     }
 }
+
 
 
 

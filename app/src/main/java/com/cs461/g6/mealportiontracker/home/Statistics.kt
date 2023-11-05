@@ -137,7 +137,6 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
             endDate = endOfWeekDate
         }
 
-
         LaunchedEffect(currentUser to filterDate to selectedFilter) {
             fetchUserMealHistories(currentUser.uid, filterDate, endDate) { mealHistories ->
                 val (calories, fats, proteins, carbo) = calculateTotalStatistics(mealHistories)
@@ -150,8 +149,6 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
                 recommendedCalories = calories
             }
         }
-
-
     }
 
     val scrollState = rememberScrollState()
@@ -168,7 +165,6 @@ fun ScreenStats(sessionManager: SessionManager, navController: NavHostController
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(3.dp)
             .verticalScroll(state = scrollState)
             .height(height)
             .padding(bottom = 20.dp)
@@ -225,7 +221,7 @@ fun DateFilterTabs(todaySelected: Boolean, onTodayClicked: () -> Unit, onThisWee
         modifier = Modifier.fillMaxWidth(),
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
-                height = (3.dp),
+                height = (4.dp),
                 color = mealColors.secondary,
                 modifier = Modifier
                     .tabIndicatorOffset(tabPositions[if (todaySelected) 0 else 1])
@@ -233,17 +229,19 @@ fun DateFilterTabs(todaySelected: Boolean, onTodayClicked: () -> Unit, onThisWee
         }
     ) {
         Tab(selected = todaySelected, onClick = onTodayClicked) {
-            Text("Today", modifier = Modifier
-                .padding(10.dp))
+            Text("Today",
+                fontWeight = FontWeight.W500,
+                color = Color.White,
+                modifier = Modifier.padding(10.dp))
         }
         Tab(selected = !todaySelected, onClick = onThisWeekClicked) {
-            Text("This Week", modifier = Modifier
-                .padding(10.dp))
+            Text("This Week",
+                fontWeight = FontWeight.W500,
+                color = Color.White,
+                modifier = Modifier.padding(10.dp))
         }
     }
 }
-
-
 
 
 @Composable
@@ -261,7 +259,6 @@ fun MealStatsContent(
     val configuration = LocalConfiguration.current
 
     Column(
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
@@ -316,7 +313,15 @@ fun MealStatsContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Total Calories", fontWeight = FontWeight.Bold)
-                Text("$totalCalories")
+                Text("$totalCalories kcals")
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp)
+            ) {
+                Text("Total Macronutrients (per 100g)", fontWeight = FontWeight.Bold)
             }
 
             Row(
@@ -325,8 +330,8 @@ fun MealStatsContent(
                     .padding(horizontal = 30.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Total Fats (per 100g)", fontWeight = FontWeight.Bold)
-                Text("$totalFats g")
+                Text("Fats:", fontWeight = FontWeight.Bold)
+                Text("$totalFats")
             }
 
             Row(
@@ -335,8 +340,8 @@ fun MealStatsContent(
                     .padding(horizontal = 30.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Total Proteins (per 100g)", fontWeight = FontWeight.Bold)
-                Text("$totalProteins g")
+                Text("Proteins: ", fontWeight = FontWeight.Bold)
+                Text("$totalProteins")
             }
 
             Row(
@@ -345,8 +350,8 @@ fun MealStatsContent(
                     .padding(horizontal = 30.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Total Carbohydrates (per 100g)", fontWeight = FontWeight.Bold)
-                Text("$totalCarbo g")
+                Text("Carbohydrates: ", fontWeight = FontWeight.Bold)
+                Text("$totalCarbo")
             }
         }
     }

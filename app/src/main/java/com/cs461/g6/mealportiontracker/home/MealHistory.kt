@@ -15,6 +15,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -81,8 +82,8 @@ class MealHistory : ComponentActivity() {
 @Composable
 fun ScreenHistory() {
 
+    val loading = remember { mutableStateOf(true) }
     val currentUser = FirebaseAuthUtil.getCurrentUser()
-    Log.i("------------------", "Loaded ScreenHistory")
 
     LaunchedEffect(key1 = currentUser) {
         if (currentUser != null ) {
@@ -99,6 +100,7 @@ fun ScreenHistory() {
                         }
                     }
                     mealHistories = temp
+                    loading.value = false
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -108,24 +110,24 @@ fun ScreenHistory() {
             })
         }
     }
-
-
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-
-        // List here
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+    if (!loading.value) {
+        Column(
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = PaddingValues(vertical = 16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            items(mealHistories) { meal ->
-                MealEntryCard(meal)
+
+            // List here
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(vertical = 16.dp)
+            ) {
+                items(mealHistories.reversed()) { meal ->
+                    MealEntryCard(meal)
+                }
             }
         }
     }
@@ -231,19 +233,16 @@ fun MealEntryCard(meal: MealEntry) {
                 }
             },
             confirmButton = {
-                Button(
-                    modifier = Modifier.padding(bottom = 8.dp),
-                    shape = RoundedCornerShape(20.dp),
+                TextButton(
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = mealColors.secondary,
                         contentColor = Color.White),
-                    onClick = { openDialog.value = false }
-
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_exit),
-                        contentDescription = "Exit",
-                    )
+                    onClick = { openDialog.value = false }) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.ic_exit),
+//                        contentDescription = "Exit",
+//                    )
+                    Text(text = "Close")
                 }
             },
             modifier = Modifier.padding(5.dp)
