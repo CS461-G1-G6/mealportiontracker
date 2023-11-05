@@ -1,9 +1,11 @@
 package com.cs461.g6.mealportiontracker.home
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +16,10 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -42,6 +48,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Query
 import com.google.firebase.database.ValueEventListener
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 
@@ -56,10 +64,13 @@ data class MealEntry(
     val userId: String = ""
 )
 
+enum class DateFilter { TODAY, LAST_WEEK, ALL_TIME }
+var dateFilter = mutableStateOf(DateFilter.TODAY)
 var mealHistories = mutableListOf<MealEntry>()
 
 class MealHistory : ComponentActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -79,6 +90,7 @@ class MealHistory : ComponentActivity() {
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScreenHistory() {
 
@@ -94,7 +106,6 @@ fun ScreenHistory() {
                     val temp = mutableListOf<MealEntry>()
                     for (dataSnapshot in snapshot.children) {
                         val meal = dataSnapshot.getValue(MealEntry::class.java)
-                        Log.d("Test", meal.toString())
                         meal?.let {
                             temp.add(it)
                         }
@@ -112,20 +123,30 @@ fun ScreenHistory() {
     }
     if (!loading.value) {
         Column(
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
+
+            DateFilterTabs(
+                selectedFilter = dateFilter.value,
+                onTodayClicked = { dateFilter.value = DateFilter.TODAY },
+                onLastWeekClicked = { dateFilter.value = DateFilter.LAST_WEEK },
+                onAllClicked = { dateFilter.value = DateFilter.ALL_TIME }
+            )
 
             // List here
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = PaddingValues(vertical = 16.dp)
+                contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
             ) {
-                items(mealHistories.reversed()) { meal ->
+                val meals = when (dateFilter.value) {
+                    DateFilter.TODAY -> mealHistories.filterToday()
+                    DateFilter.LAST_WEEK -> mealHistories.filterLastWeek()
+                    DateFilter.ALL_TIME -> mealHistories.filterAllTime()
+                }
+                items(meals.reversed()) { meal ->
                     MealEntryCard(meal)
                 }
             }
@@ -251,11 +272,70 @@ fun MealEntryCard(meal: MealEntry) {
     }
 }
 
-
-
-
 fun String.toTitleCase(): String {
     return split(" ").joinToString(" ") { word ->
         word.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 }
+
+@Composable
+fun DateFilterTabs(
+    selectedFilter: DateFilter,
+    onTodayClicked: () -> Unit,
+    onLastWeekClicked: () -> Unit,
+    onAllClicked: () -> Unit
+) {
+    TabRow(
+        selectedTabIndex = selectedFilter.ordinal,
+        modifier = Modifier.fillMaxWidth(),
+        indicator = { tabPositions ->
+            TabRowDefaults.Indicator(
+                height = (4.dp),
+                color = mealColors.secondary,
+                modifier = Modifier.tabIndicatorOffset(tabPositions[selectedFilter.ordinal])
+            )
+        }
+    ) {
+        Tab(selected = selectedFilter == DateFilter.TODAY, onClick = onTodayClicked) {
+            Text("Today",
+                fontWeight = FontWeight.W500,
+                color = Color.White,
+                modifier = Modifier.padding(10.dp))
+        }
+        Tab(selected = selectedFilter == DateFilter.LAST_WEEK, onClick = onLastWeekClicked) {
+            Text("Last Week",
+                fontWeight = FontWeight.W500,
+                color = Color.White,
+                modifier = Modifier.padding(10.dp))
+        }
+        Tab(selected = selectedFilter == DateFilter.ALL_TIME, onClick = onAllClicked) {
+            Text("All",
+                fontWeight = FontWeight.W500,
+                color = Color.White,
+                modifier = Modifier.padding(10.dp))
+        }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun List<MealEntry>.filterLastWeek(): List<MealEntry> {
+    val oneWeekAgo = LocalDate.now()
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    return this.filter {
+        LocalDate.parse(it.date, formatter) >= oneWeekAgo.minusWeeks(1)
+    }
+}
+@RequiresApi(Build.VERSION_CODES.O)
+fun List<MealEntry>.filterToday(): List<MealEntry> {
+    val today = LocalDate.now()
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    return this.filter {
+        LocalDate.parse(it.date, formatter).isEqual(today)
+    }
+}
+
+fun List<MealEntry>.filterAllTime(): List<MealEntry> {
+    return this
+}
+
