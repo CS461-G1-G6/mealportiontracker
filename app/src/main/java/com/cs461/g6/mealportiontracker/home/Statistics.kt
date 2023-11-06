@@ -370,7 +370,7 @@ fun NoRecordsFoundContent(context: Context) {
             .padding(3.dp)
     ) {
         Text(
-            text = "No records found",
+            text = "No records found! Log a meal now to view your stats :)",
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp

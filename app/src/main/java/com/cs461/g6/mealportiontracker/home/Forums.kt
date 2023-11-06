@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,6 +46,7 @@ import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.core.SessionManager
 import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.cs461.g6.mealportiontracker.theme.mealColors
+import com.cs461.g6.mealportiontracker.theme.mealColorsAlt
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -70,6 +72,7 @@ class Forums : ComponentActivity() {
             // You can pass your NavHostController and SessionManager to ScreenStats
             val navController: NavHostController = remember { NavHostController(this) }
             val sessionManager: SessionManager = remember { SessionManager(this) }
+
 
             MealTheme {
                 // Display the ScreenStats composable within the ComposeView
@@ -169,28 +172,29 @@ fun CreatePost(
 fun PostEntryCard(post: Post) {
     val isExpanded = remember { mutableStateOf(false) }
     val shortTextLimit = 70
-
+    val currentUser = FirebaseAuthUtil.getCurrentUser()
+    val currentUserId = currentUser?.uid
     val bodyText = if (isExpanded.value || post.body.length <= shortTextLimit) post.body else post.body.take(shortTextLimit)
-
     Card(
         modifier = Modifier
             .padding(vertical = 10.dp)
             .fillMaxWidth(),
-        backgroundColor = mealColors.background,
+        backgroundColor = if (post.userId == currentUserId) mealColorsAlt.surface else mealColors.background,
         shape = RoundedCornerShape(10.dp),
         elevation = 10.dp
     ) {
+        Log.i("USER ID CHECK: ", "postid: $post.userId, userid: $currentUserId" )
         Column {
             Spacer(Modifier.height(15.dp))
 
             Row(Modifier.padding(horizontal = 15.dp)) {
                 Column {
-                    val currentUser = FirebaseAuthUtil.getCurrentUser()
-                    if (post.userId == currentUser.toString()){
+
+                    if (post.userId == currentUserId){
                         Icon(
-                            imageVector = Icons.Filled.AccountCircle,
-                            contentDescription = "Read More / Less",
-                            tint = mealColors.secondary
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = "Your Post",
+                            tint = mealColors.secondaryVariant
                         )
                     }
 

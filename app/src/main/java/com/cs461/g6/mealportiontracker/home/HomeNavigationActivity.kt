@@ -265,8 +265,7 @@ private fun AppNavHost(
 
 
         composable(route = AppScreen.ScreenHistory.name) {
-            ScreenHistory()
-            Log.i("------------------", "Clicked ScreenHistory")
+            ScreenHistory() // you can ignore this error
         }
 
         composable(route = AppScreen.ScreenStats.name) {

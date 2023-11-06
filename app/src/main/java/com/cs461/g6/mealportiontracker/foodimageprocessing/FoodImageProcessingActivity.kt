@@ -27,6 +27,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.FirebaseApp
 import android.net.Uri
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import coil.compose.rememberAsyncImagePainter
 import com.bumptech.glide.request.transition.Transition
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
@@ -114,7 +117,7 @@ fun App(imageUri: String) {
                 FoodInfoRow("Fats", foodInfo!!.fats.toString())
             }
 
-            // Add your button here
+            // Add
             Button(
                 onClick = {
                     if (foodInfo != null) {
@@ -134,8 +137,30 @@ fun App(imageUri: String) {
                     backgroundColor = mealColors.primary // Set the background color to the primary color
                 )
             ) {
+                IconButton(onClick = {}) {
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
+                }
                 Text("Add Food", color = mealColors.onPrimary)
+            }
 
+            // Go back to HomeNav, don't save food
+            Button(
+                onClick = {
+
+                        val intent =
+                            Intent(Intent(context, HomeNavigationActivity::class.java))
+//                        intent.putExtra("isFromFoodProcessed", true)
+                        context.startActivity(intent)
+                },
+                modifier = Modifier.padding(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = mealColors.primary // Set the background color to the primary color
+                )
+            ) {
+                IconButton(onClick = {}) {
+                    Icon(imageVector = Icons.Filled.Clear, contentDescription = "Cancel")
+                }
+                Text("Cancel", color = mealColors.primaryVariant)
             }
 
         } else {

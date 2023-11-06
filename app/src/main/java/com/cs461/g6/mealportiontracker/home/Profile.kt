@@ -261,7 +261,7 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 30.dp),
+                                    .padding(horizontal = 6.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text("Email:", fontWeight = FontWeight.W700, fontSize = 16.sp)
