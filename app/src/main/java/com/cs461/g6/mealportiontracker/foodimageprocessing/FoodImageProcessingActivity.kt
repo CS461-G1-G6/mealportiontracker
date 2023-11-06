@@ -1,6 +1,7 @@
 package com.cs461.g6.mealportiontracker.foodimageprocessing
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -19,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberImagePainter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.cs461.g6.mealportiontracker.theme.mealColors
@@ -30,6 +30,7 @@ import android.net.Uri
 import coil.compose.rememberAsyncImagePainter
 import com.bumptech.glide.request.transition.Transition
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
+import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
 import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -118,7 +119,12 @@ fun App(imageUri: String) {
                 onClick = {
                     if (foodInfo != null) {
                         addFoodInfoToFirebase(context, foodInfo!!, imageUri)
-
+                        // Go to HomeNavigation here
+                        // Create an Intent to start HomeNavigationActivity
+                        val intent =
+                            Intent(Intent(context, HomeNavigationActivity::class.java))
+//                        intent.putExtra("isFromFoodProcessed", true)
+                        context.startActivity(intent)
                     } else {
                         mToast(context, "No Food information")
                     }
