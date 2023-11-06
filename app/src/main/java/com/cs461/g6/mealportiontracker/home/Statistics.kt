@@ -324,6 +324,8 @@ fun MealStatsContent(
                 Text("Total Macronutrients (per 100g)", fontWeight = FontWeight.Bold)
             }
 
+            Spacer(modifier = Modifier.height(15.dp))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

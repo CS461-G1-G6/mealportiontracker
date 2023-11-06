@@ -30,7 +30,7 @@ val mealColorsAlt = lightColors(
     onSecondary = Color(0xFF000000),
     background = Color(0xFFFFFFFF),
     onBackground = Color(0xFF000000),
-    surface = Color(0xFFFFDF92),
+    surface = Color(0xFFFFFBEF),
     onSurface = Color(0xFF000000),
     error = Color(0xFFB00020),
 )

@@ -3,6 +3,7 @@ package com.cs461.g6.mealportiontracker.core
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.cs461.g6.mealportiontracker.R
 import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
 import com.cs461.g6.mealportiontracker.samples.animation.*
 import com.cs461.g6.mealportiontracker.samples.customview.*
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setTheme(R.style.AppTheme)  // Set the theme back to AppTheme
         // startActivity(Intent(this, HomeNavigationActivity::class.java))
         startActivity(Intent(this, AccountNavigationActivity::class.java))
 //        setContentView(R.layout.activity_main)

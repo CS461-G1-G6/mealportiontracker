@@ -30,6 +30,7 @@ import android.net.Uri
 import coil.compose.rememberAsyncImagePainter
 import com.bumptech.glide.request.transition.Transition
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
+import com.cs461.g6.mealportiontracker.theme.MealTheme
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.pytorch.IValue
@@ -74,7 +75,9 @@ class FoodImageProcessingActivity : AppCompatActivity() {
         val imageUri = intent.getStringExtra("imageUri")
         if (imageUri != null) {
             setContent {
-                App(imageUri)
+                MealTheme {
+                    App(imageUri)
+                }
             }
         }
     }
@@ -98,7 +101,9 @@ fun App(imageUri: String) {
                 Image(
                     painter = rememberAsyncImagePainter(model = imageUri),
                     contentDescription = null, // Set a meaningful content description
-                    modifier = Modifier.fillMaxWidth().height(200.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
                 )
 
                 FoodInfoRow("Food Name", foodInfo!!.name)
@@ -142,7 +147,9 @@ fun App(imageUri: String) {
 @Composable
 fun FoodInfoRow(label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp),
 //        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(

@@ -1,7 +1,7 @@
 <resources>
 
 <!--App Stuff-->
-    <string name="app_name">Meal Portion Tracker</string>
+    <string name="app_name">Meal Calorie Tracker</string>
     <string name="app_tagline">Healthy meals everyday!</string>
 
 <!--Labels (Buttons, TextViews, etc.)-->

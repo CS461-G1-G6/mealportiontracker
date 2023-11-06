@@ -49,8 +49,9 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
     )
     {
         Image(
-            painter = painterResource(id = R.drawable.logo_medium),
-            contentDescription = "App Logo"
+            painter = painterResource(id = R.drawable.logo_title_shadow),
+            contentDescription = "App Logo",
+            modifier = Modifier.width(300.dp)
         )
         OutlinedTextField(
             value = email,
@@ -127,7 +128,7 @@ fun LoginScreen(navController: NavHostController, sessionManager: SessionManager
             Text("Login")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(onClick = {
             isLoading = true // Show the progress dialog

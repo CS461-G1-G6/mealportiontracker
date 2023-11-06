@@ -40,6 +40,7 @@ import com.cs461.g6.mealportiontracker.core.FoodItem
 import com.cs461.g6.mealportiontracker.foodimageprocessing.mToast
 import com.cs461.g6.mealportiontracker.core.SessionManager
 import com.cs461.g6.mealportiontracker.theme.mealColors
+import com.cs461.g6.mealportiontracker.theme.mealColorsAlt
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -346,10 +347,18 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                         ) {
                             Text("Active Status:", fontWeight = FontWeight.W700, fontSize = 15.sp)
                             Text(
-                                text = selectedActivity.toString(),
+                                text = when(selectedActivity) {
+                                    1.2 -> "Sedentary"
+                                    1.375 -> "Lightly Active"
+                                    1.55 -> "Moderately Active"
+                                    1.725 -> "Very Active"
+                                    1.9 -> "Super Active"
+                                    else -> " "
+                                },
                                 fontSize = 15.sp,
                                 textAlign = TextAlign.Start
                             )
+
                         }
 
                     }
@@ -640,40 +649,89 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            Text(
-                text = " Recommended Daily Calories: ",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.W700
-            )
-
-            val calorieRec = recommendedCalories.roundToInt().toString()
-            Text(
-                text = "$calorieRec kcals",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                fontStyle = FontStyle.Italic
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = " Recommended Food: ",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.W700
-            )
-
-            if (showRecommendedFoods) {
-                RecommendedFoodListRow(recommendedFoodList, recommendedCalories)
-            }
-
-            Button(
-                onClick = {
-                    RefreshButtonClickFlag = true
-                    refreshed = true
-                    showRecommendedFoods = false
-                }
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                backgroundColor = mealColors.onPrimary,
+                elevation = 5.dp
             ) {
-                Text("New Recommended Foods")
+
+                Column(modifier = Modifier.padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = " Recommended Daily Calories: ",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.W900
+                        )
+
+                        val calorieRec = recommendedCalories.roundToInt().toString()
+                        Text(
+                            text = "$calorieRec kcals",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontStyle = FontStyle.Italic
+                        )
+                }
             }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                backgroundColor = mealColors.onPrimary,
+                elevation = 5.dp
+            ) {
+
+                Column(modifier = Modifier.padding(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = " Recommended Foods: ",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.W900
+                    )
+
+                    Text(
+                        text = "3 Foods within your daily caloric limit: ",
+                        fontSize = 14.sp,
+                        fontStyle = FontStyle.Italic
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+
+                    if (showRecommendedFoods) {
+                        RecommendedFoodListRow(recommendedFoodList, recommendedCalories)
+                    }
+
+                    // Refresh Button
+                    Button(shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = Color.White,
+                            backgroundColor = mealColors.secondary,
+                        ),
+                        onClick = {
+                            RefreshButtonClickFlag = true
+                            refreshed = true
+                            showRecommendedFoods = false
+                        }) {
+                        Icon(
+                            painterResource(id = R.drawable.ic_refresh),
+                            contentDescription = "Refresh",
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Text(
+                            " Refresh Suggestions",
+                            fontSize = 14.sp
+                        )
+                    }
+
+                }
+            }
+
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -767,14 +825,29 @@ fun RecommendedFoodListRow(items: List<FoodItem>, calorieLimit: Float) {
 
 @Composable
 private fun FoodItemRow(item: FoodItem) {
-    Text(
-        text = item.name,
-        fontWeight = FontWeight.Bold
-    )
-    Spacer(modifier = Modifier.height(3.dp))
-    Text(
-        text = "Calories: " + item.calories.toString(),
-    )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(5.dp),
+        backgroundColor = mealColorsAlt.surface,
+    ){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)) {
+            Text(
+                text = item.name,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W700
+            )
+            Spacer(modifier = Modifier.height(3.dp))
+            Text(
+                fontSize = 12.sp,
+                fontStyle = FontStyle.Italic,
+                text = item.calories.toString() + " kcals",
+            )
+        }
+
+    }
     Spacer(modifier = Modifier.height(8.dp))
 }
 
