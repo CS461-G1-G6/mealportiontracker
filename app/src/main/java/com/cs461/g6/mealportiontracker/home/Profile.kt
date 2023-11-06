@@ -714,9 +714,10 @@ fun ScreenProfile(sessionManager: SessionManager, navController: NavHostControll
                             backgroundColor = mealColors.secondary,
                         ),
                         onClick = {
+                            showRecommendedFoods = false
                             RefreshButtonClickFlag = true
                             refreshed = true
-                            showRecommendedFoods = false
+                            showRecommendedFoods = true
                         }) {
                         Icon(
                             painterResource(id = R.drawable.ic_refresh),
