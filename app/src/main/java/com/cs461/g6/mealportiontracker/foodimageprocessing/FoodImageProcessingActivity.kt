@@ -27,11 +27,15 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.FirebaseApp
 import android.net.Uri
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.ui.res.painterResource
 import coil.compose.rememberAsyncImagePainter
 import com.bumptech.glide.request.transition.Transition
+import com.cs461.g6.mealportiontracker.R
+import com.cs461.g6.mealportiontracker.accounts.AccountNavigationActivity
 import com.cs461.g6.mealportiontracker.core.FirebaseAuthUtil
 import com.cs461.g6.mealportiontracker.home.HomeNavigationActivity
 import com.cs461.g6.mealportiontracker.theme.MealTheme
@@ -118,7 +122,11 @@ fun App(imageUri: String) {
             }
 
             // Add
-            Button(
+            Button(shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.White,
+                    backgroundColor = mealColors.secondary,
+                ),
                 onClick = {
                     if (foodInfo != null) {
                         addFoodInfoToFirebase(context, foodInfo!!, imageUri)
@@ -131,36 +139,41 @@ fun App(imageUri: String) {
                     } else {
                         mToast(context, "No Food information")
                     }
-                },
-                modifier = Modifier.padding(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = mealColors.primary // Set the background color to the primary color
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add Food",
+                    modifier = Modifier.size(15.dp)
                 )
-            ) {
-                IconButton(onClick = {}) {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
-                }
-                Text("Add Food", color = mealColors.onPrimary)
+                Text(
+                    "Add Food",
+                    fontSize = 14.sp
+                )
             }
 
+
             // Go back to HomeNav, don't save food
-            Button(
+            Button(shape = RoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = Color.White,
+                    backgroundColor = mealColors.primaryVariant,
+                ),
                 onClick = {
 
-                        val intent =
-                            Intent(Intent(context, HomeNavigationActivity::class.java))
+                    val intent =
+                        Intent(Intent(context, HomeNavigationActivity::class.java))
 //                        intent.putExtra("isFromFoodProcessed", true)
-                        context.startActivity(intent)
-                },
-                modifier = Modifier.padding(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = mealColors.primary // Set the background color to the primary color
+                    context.startActivity(intent)
+                }) {
+                Icon(
+                    imageVector = Icons.Filled.Clear,
+                    contentDescription = "Cancel",
+                    modifier = Modifier.size(15.dp)
                 )
-            ) {
-                IconButton(onClick = {}) {
-                    Icon(imageVector = Icons.Filled.Clear, contentDescription = "Cancel")
-                }
-                Text("Cancel", color = mealColors.primaryVariant)
+                Text(
+                    " Cancel",
+                    fontSize = 14.sp
+                )
             }
 
         } else {
