@@ -14,18 +14,18 @@ An innovative Android app where users can take an image of their food, and the a
 
 - [x]   🔐  User Authentication with Firebase
 
-- [ ]   🍽️  Personalized Calorie Recommendations
+- [x]   🍽️  Personalized Calorie Recommendations
 
 - [x]   🍔  Automatic Food Detection
     - [x]   📸  By Image Capture
     - [x]   🖼️  From Gallery
     - [x]   👾  By QR / Barcode
 
-- [ ]   🤖  Pytorch Integration for Food Detection
+- [x]   🤖  Pytorch Integration for Food Detection
 
-- [ ]   🍚  Meal Logging
+- [x]   🍚  Meal Logging
 
-- [ ]   🗣️  Community Discussion Forums
+- [x]   🗣️  Community Discussion Forums
 
 - [ ]   Improved Food Model Dataset
 
